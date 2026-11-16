@@ -1,0 +1,141 @@
+{
+  "name": "pipeline_cv",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Dépôt du CV",
+        "formDescription": "Déposez ici le CV que vous souhaitez anonymiser",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "CV du candidat",
+              "fieldType": "file",
+              "fieldName": "cv",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf, .docx",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ac66553a-f901-4bda-9f64-18b42b4c49ff",
+      "name": "On form submission",
+      "webhookId": "be9c5bc0-6f2d-49a4-a65f-f056c5ac3742"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "cv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "338c9d13-7dae-44d1-b613-234b43261a4d",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"identite\": {\n    \"prenom\": \"Jean\",\n    \"nom\": \"Dupont\",\n    \"email\": \"jean.dupont@exemple.fr\",\n    \"telephone\": \"06 12 34 56 78\",\n    \"adresse\": \"12 rue des Lilas, 37000 Tours\",\n    \"ville\": \"Tours\",\n    \"code_postal\": \"37000\"\n  },\n  \"titre\": \"Data Analyst\",\n  \"annees_experience\": 5,\n  \"competences_techniques\": [\"SQL\", \"Power BI\", \"Python (pandas)\"],\n  \"savoir_etre\": [\"Pédagogie\", \"Rigueur\"],\n  \"experiences\": [\n    {\n      \"poste\": \"Data Analyst\",\n      \"entreprise\": \"Nom exact de l'employeur\",\n      \"description_entreprise\": \"Banque régionale, 2 300 collaborateurs\",\n      \"lieu\": \"Ville\",\n      \"debut\": \"sept. 2022\",\n      \"fin\": \"aujourd'hui\",\n      \"missions\": [\"Conception de tableaux de bord\", \"Automatisation de reportings\"],\n      \"environnement\": [\"Power BI\", \"SQL Server\", \"Python\"]\n    }\n  ],\n  \"formations\": [\n    { \"diplome\": \"Master MIAGE\", \"etablissement\": \"Nom de l'université\", \"annee\": \"2019\" }\n  ],\n  \"langues\": [{ \"langue\": \"Anglais\", \"niveau\": \"courant\" }],\n  \"certifications\": [\"Nom de la certification (année)\"]\n}",
+        "options": {
+          "systemPromptTemplate": "You are an HR assistant at a consulting firm. You receive the raw text of a CV, extracted from a PDF (the layout may be messy). Your mission: extract the information FAITHFULLY into the requested JSON structure.\n\nRules:\n- Do not invent, infer, summarize or rephrase anything. Copy values as written in the CV, in their original language (French). Do not translate.\n- If a piece of information is missing, return an empty string \"\" (or an empty array []). Never fill a gap with a guess.\n- \"identite\" contains only the candidate's own personal data. Never use the contact details of references or other people.\n- \"adresse\": the full postal address as written (street, postal code, city).\n- \"annees_experience\": if the CV states a number of years of experience, copy it. Otherwise estimate the total years of professional experience, internships excluded, as an integer.\n- \"description_entreprise\": copy the line describing the employer (sector, size) exactly as written, if present.\n- \"competences_techniques\" and \"savoir_etre\": keep tools, technologies and methods separate from soft skills, following the CV's own sections when they exist.\n- \"environnement\": the technologies listed for each position.\n- \"langues\": copy the level as written, including any detail (e.g. \"courant (TOEIC 905)\").\n- \"certifications\": keep the exact name and the year if one is given.\n- Keep the exact names of employers, places and schools: they are handled later in the pipeline.\n- Ignore hobbies, interests, volunteering and references: do not extract them."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "c91171e5-b7f3-4fc2-9e09-1be5ac0c7ff3",
+      "name": "Information Extractor",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "model": "ministral-14b-2512",
+        "options": {
+          "maxTokens": 5000,
+          "temperature": 0.2
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        384,
+        208
+      ],
+      "id": "cb8d7f75-4412-48bb-b89a-4d32b66bb30c",
+      "name": "Mistral Cloud Chat Model",
+      "notesInFlow": false,
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "E5c6CksBpbEATbdC",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1a496d84-e45d-48bf-8b68-9243f165a753",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a2d15b2724d91d266307d56cee86776286ea57ffc4ba17ffcc89f316f58c5039"
+  },
+  "nodeGroups": [],
+  "id": "KObTLZeWY0lV3jcB",
+  "tags": []
+}
