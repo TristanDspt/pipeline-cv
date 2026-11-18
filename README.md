@@ -183,7 +183,7 @@ Ce sont des limites assumées pour un projet de cours. Elles sont documentées p
 - La liste des termes à masquer vient de ce que l'extraction a lu. Si une **faute de transcription** touche un nom propre (cas observé une fois : un nom propre transcrit avec une lettre de trop sur un CV scanné), le terme masqué n'est pas le bon. Sur nos tests, aucun nom n'a fuité dans le PDF final, mais **un CV scanné demande une relecture plus attentive**.
 
 **Extraction**
-- Un **CV scanné** est lu par le modèle vision : bonne transcription sur nos tests, mais **non garantie**. Testé sur **un seul CV d'une page** ; les scans de mauvaise qualité (photo, penchés) ne sont pas testés. La branche est aussi plus lente (environ +55 s) et limitée à 12 pages.
+- Un **CV scanné** est lu par le modèle vision : bonne transcription sur nos tests, mais **non garantie**. Testé sur **un seul CV d'une page**, mais volontairement dégradé (penché, perspective, ombre, fond grisé) : une qualité plus mauvaise (très flou, basse résolution) n'est pas testée. La branche est aussi plus lente (environ +55 s) et limitée à 12 pages.
 
 **Matériel et exploitation**
 - Il faut **Ollama lancé** et ~12 Go de VRAM libres. La **première requête** après 30 min d'inactivité paie le chargement du modèle (~70 s).
