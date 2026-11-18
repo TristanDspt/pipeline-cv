@@ -77,7 +77,7 @@ function ajouterSiValide(termes, valeur) {
 // toute l'identité + employeurs, lieux et écoles du profil.
 function construireTermes(identite, profil) {
   const termes = [];
-  for (const v of Object.values(identite)) ajouterSiValide(termes, v);
+  for (const v of Object.values(identite).flat()) ajouterSiValide(termes, v);
 
   for (const exp of profil.experiences ?? []) {
     for (const champ of ['entreprise', 'lieu']) {

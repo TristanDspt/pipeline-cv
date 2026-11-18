@@ -1,0 +1,193 @@
+{
+  "name": "lien_cv_anonymisé",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "cv-anonyme",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "16ed95cb-18df-42e6-b2ed-060cdacd2436",
+      "name": "Endpoint_cv",
+      "webhookId": "88c37b30-3703-41a0-a227-74ad7c69aa43"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "742b68a1-f0a7-427d-a6af-d88ac5573da1",
+              "leftValue": "={{ $json.query.code }}",
+              "rightValue": "^CONS-[A-Z0-9]{6}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "2a12efc5-e590-48a2-92fc-e58a83a28b90",
+      "name": "Code valide ?"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=/files/{{ $json.query.code }}.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        -224
+      ],
+      "id": "bdcf5624-b801-4fc5-8131-b096258b8214",
+      "name": "Lire le PDF",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "responseDataSource": "set",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/pdf"
+              },
+              {
+                "name": "Content-Disposition",
+                "value": "inline"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        -320
+      ],
+      "id": "87ade6f0-6c17-48f8-8cf6-9ef82d7a5a0d",
+      "name": "Envoyer le PDF"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "CV anonymisé introuvable pour ce code.",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        672,
+        -128
+      ],
+      "id": "802dbd16-db8f-40da-9caa-f3c6ade3e90b",
+      "name": "PDF introuvable"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Code consultant invalide.",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        448,
+        96
+      ],
+      "id": "03c5cf66-1809-44e8-a2ec-b9b963298fda",
+      "name": "Code invalide"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Endpoint_cv": {
+      "main": [
+        [
+          {
+            "node": "Code valide ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code valide ?": {
+      "main": [
+        [
+          {
+            "node": "Lire le PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code invalide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lire le PDF": {
+      "main": [
+        [
+          {
+            "node": "Envoyer le PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PDF introuvable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "34efa476-b09d-49bf-b743-f0fba7fcbdd4",
+  "meta": {
+    "instanceId": "4a14aa3c83848608319aa9494f286544e462c72f3a3d72f4d2dacb38f380c838"
+  },
+  "nodeGroups": [],
+  "id": "r12dHklbg5IKf6kB",
+  "tags": []
+}

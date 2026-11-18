@@ -1,43 +1,10 @@
 {
-  "name": "pipeline_cv",
+  "name": "pipeline_cv_mistral",
   "nodes": [
     {
       "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 4
-          },
-          "conditions": [
-            {
-              "id": "705e285a-638a-4274-8688-d28284f2c596",
-              "leftValue": "={{ $json.cv.mimetype }}",
-              "rightValue": "application/pdf",
-              "operator": {
-                "type": "string",
-                "operation": "equals"
-              }
-            }
-          ],
-          "combinator": "or"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.4,
-      "position": [
-        224,
-        -64
-      ],
-      "id": "de29a027-2fd8-48c3-882e-0434b0f5a9ad",
-      "name": "PDF ou DOCX"
-    },
-    {
-      "parameters": {
         "formTitle": "Dépôt du CV",
-        "formDescription": "Déposez ici le CV que vous souhaitez anonymiser",
+        "formDescription": "Déposez ici le CV que vous souhaitez anonymiser\nNE PAS FERMER CETTE FENETRE",
         "formFields": {
           "values": [
             {
@@ -55,18 +22,18 @@
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.6,
       "position": [
-        0,
-        -64
+        64,
+        144
       ],
-      "id": "e4c44bea-dfbe-4dd2-b4e2-4fc7506fa3ae",
+      "id": "a5a7b423-066e-4d0b-aaf6-fdf862170e94",
       "name": "Formulaire dépose CV",
-      "webhookId": "fc0eacc5-1de1-4153-8046-dfb22cc23573"
+      "webhookId": "8e82b720-525d-47e6-83ca-f08670564f53"
     },
     {
       "parameters": {
         "text": "={{ $json.text }}",
         "schemaType": "fromJson",
-        "jsonSchemaExample": "{\n  \"identite\": {\n    \"prenom\": \"Jean\",\n    \"nom\": \"Dupont\",\n    \"email\": \"jean.dupont@exemple.fr\",\n    \"telephone\": \"06 12 34 56 78\",\n    \"adresse\": \"12 rue des Lilas, 37000 Tours\",\n    \"ville\": \"Tours\",\n    \"code_postal\": \"37000\"\n  },\n  \"titre\": \"Data Analyst\",\n  \"annees_experience\": 5,\n  \"competences_techniques\": [\"SQL\", \"Power BI\", \"Python (pandas)\"],\n  \"savoir_etre\": [\"Pédagogie\", \"Rigueur\"],\n  \"experiences\": [\n    {\n      \"poste\": \"Data Analyst\",\n      \"entreprise\": \"Nom exact de l'employeur\",\n      \"description_entreprise\": \"Banque régionale, 2 300 collaborateurs\",\n      \"lieu\": \"Ville\",\n      \"debut\": \"sept. 2022\",\n      \"fin\": \"aujourd'hui\",\n      \"missions\": [\"Conception de tableaux de bord\", \"Automatisation de reportings\"],\n      \"environnement\": [\"Power BI\", \"SQL Server\", \"Python\"]\n    }\n  ],\n  \"formations\": [\n    { \"diplome\": \"Master MIAGE\", \"etablissement\": \"Nom de l'université\", \"annee\": \"2019\" }\n  ],\n  \"langues\": [{ \"langue\": \"Anglais\", \"niveau\": \"courant\" }],\n  \"certifications\": [\"Nom de la certification (année)\"]\n}",
+        "jsonSchemaExample": "{\n  \"identite\": {\n    \"prenom\": \"Jean\",\n    \"nom\": \"Dupont\",\n    \"email\": \"jean.dupont@exemple.fr\",\n    \"telephone\": \"06 12 34 56 78\",\n    \"adresse\": \"12 rue des Lilas, 37000 Tours\",\n    \"ville\": \"Tours\",\n    \"code_postal\": \"37000\",\n    \"linkedin\": \"https://www.linkedin.com/in/exemple\",\n    \"autres_liens\": [\"https://github.com/exemple\"]\n  },\n  \"titre\": \"Data Analyst\",\n  \"annees_experience\": 5,\n  \"competences_techniques\": [\"SQL\", \"Power BI\", \"Python (pandas)\"],\n  \"savoir_etre\": [\"Pédagogie\", \"Rigueur\"],\n  \"experiences\": [\n    {\n      \"poste\": \"Data Analyst\",\n      \"entreprise\": \"Nom exact de l'employeur\",\n      \"description_entreprise\": \"Banque régionale, 2 300 collaborateurs\",\n      \"lieu\": \"Ville\",\n      \"debut\": \"sept. 2022\",\n      \"fin\": \"aujourd'hui\",\n      \"missions\": [\"Conception de tableaux de bord\", \"Automatisation de reportings\"],\n      \"environnement\": [\"Power BI\", \"SQL Server\", \"Python\"]\n    }\n  ],\n  \"formations\": [\n    { \"diplome\": \"Master MIAGE\", \"etablissement\": \"Nom de l'université\", \"annee\": \"2019\" }\n  ],\n  \"langues\": [{ \"langue\": \"Anglais\", \"niveau\": \"courant\" }],\n  \"certifications\": [\"Nom de la certification (année)\"]\n}",
         "options": {
           "systemPromptTemplate": "You are an HR assistant at a consulting firm. You receive the raw text of a CV, extracted from a PDF (the layout may be messy). Your mission: extract the information FAITHFULLY into the requested JSON structure.\n\nRules:\n- Do not invent, infer, summarize or rephrase anything. Copy values as written in the CV, in their original language (French). Do not translate.\n- If a piece of information is missing, return an empty string \"\" (or an empty array []). Never fill a gap with a guess.\n- \"identite\" contains only the candidate's own personal data. Never use the contact details of references or other people.\n- \"adresse\": the full postal address as written (street, postal code, city).\n- \"annees_experience\": if the CV states a number of years of experience, copy it. Otherwise estimate the total years of professional experience, internships excluded, as an integer.\n- \"description_entreprise\": copy the line describing the employer (sector, size) exactly as written, if present.\n- \"competences_techniques\" and \"savoir_etre\": keep tools, technologies and methods separate from soft skills, following the CV's own sections when they exist.\n- \"environnement\": the technologies listed for each position.\n- \"langues\": copy the level as written, including any detail (e.g. \"courant (TOEIC 905)\").\n- \"certifications\": keep the exact name and the year if one is given.\n- Keep the exact names of employers, places and schools: they are handled later in the pipeline.\n- Ignore hobbies, interests, volunteering and references: do not extract them."
         }
@@ -74,10 +41,10 @@
       "type": "@n8n/n8n-nodes-langchain.informationExtractor",
       "typeVersion": 1.2,
       "position": [
-        768,
-        0
+        1040,
+        112
       ],
-      "id": "edb15036-e483-4f66-a1fd-4c3344d8b91b",
+      "id": "1f449887-a596-4439-aa00-009ad58228dd",
       "name": "Extraction des infos du CV",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -86,62 +53,64 @@
       "parameters": {
         "operation": "pdf",
         "binaryPropertyName": "cv",
-        "options": {}
+        "options": {
+          "keepSource": "binary"
+        }
       },
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.2,
       "position": [
-        576,
-        -80
+        528,
+        128
       ],
-      "id": "e5656820-3fb9-47b0-b797-5ff5460ca95a",
+      "id": "b3fc91f7-fe88-401e-893f-65ef07474e8e",
       "name": "Extract from PDF"
     },
     {
       "parameters": {
         "content": "# Extract",
-        "height": 880,
-        "width": 1152,
+        "height": 640,
+        "width": 1360,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -80,
-        -384
+        0,
+        0
       ],
-      "id": "71cad1d3-6bb6-4b02-b913-f2a8e55b95aa",
+      "id": "f2f928cc-8734-476d-bb68-469d4ea67b41",
       "name": "Sticky Note"
     },
     {
       "parameters": {
         "content": "# Transform",
-        "height": 880,
-        "width": 1072
+        "height": 640,
+        "width": 1040
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1072,
-        -384
+        1360,
+        0
       ],
-      "id": "aefc59ca-eb01-4860-8c84-ca1eef6f2407",
+      "id": "23a0c023-a831-403d-b810-ad74625f58e4",
       "name": "Sticky Note1"
     },
     {
       "parameters": {
         "content": "# Load",
-        "height": 880,
-        "width": 896,
+        "height": 704,
+        "width": 1776,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2144,
-        -384
+        0,
+        640
       ],
-      "id": "5613cee3-e1f4-4fa6-b058-05b1c899977d",
+      "id": "996cf6a8-aa6e-4280-8af4-8c5d22a1c169",
       "name": "Sticky Note2"
     },
     {
@@ -173,10 +142,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        1152,
-        0
+        1440,
+        208
       ],
-      "id": "ae840b50-9fa6-43c1-ace8-ab2798a24b87",
+      "id": "a9d0a670-ab77-478a-a854-1f18e9ef802a",
       "name": "Préparer le dossier"
     },
     {
@@ -189,10 +158,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1104,
-        -112
+        1392,
+        368
       ],
-      "id": "935df73a-c851-4613-a131-42681844952a",
+      "id": "3a51697e-d464-4f17-a381-ca8f61920282",
       "name": "Sticky Note3"
     },
     {
@@ -212,10 +181,10 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        1376,
-        0
+        1664,
+        208
       ],
-      "id": "83b55fba-b95a-4b14-a245-2a4048527ae2",
+      "id": "7e6d9cf7-897b-45da-bb3e-0c8f54621691",
       "name": "Rédaction du CV anonymisé",
       "retryOnFail": true,
       "waitBetweenTries": 5000
@@ -231,10 +200,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
       "typeVersion": 1,
       "position": [
-        832,
-        176
+        1120,
+        304
       ],
-      "id": "3df9a8e3-c1ad-472b-acbc-b8beb04b83ed",
+      "id": "efaedb21-17e1-41a0-8bb0-77b2fd38e547",
       "name": "Modèle IA ①",
       "notesInFlow": false,
       "credentials": {
@@ -255,10 +224,10 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
       "typeVersion": 1,
       "position": [
-        1344,
-        176
+        1648,
+        400
       ],
-      "id": "7cfa3d30-d4ca-4168-8879-91bda73e9d12",
+      "id": "66b9e205-9ad5-41d8-bee4-046272b8caf4",
       "name": "Modèle IA ②",
       "credentials": {
         "mistralCloudApi": {
@@ -274,23 +243,23 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1552,
-        176
+        1840,
+        400
       ],
-      "id": "31a1a8cd-be74-4f82-89af-3e352caffcc8",
+      "id": "85d82a4c-e8b1-476d-baee-851cafac3f8d",
       "name": "Format du CV anonymisé"
     },
     {
       "parameters": {
-        "jsCode": "// ═══════════════════════════════════════════════════════════════════════\n//  Nœud Code « Contrôle RGPD » : mode « Run Once for Each Item »\n//  Rôle : filet de sécurité SANS IA, après la rédaction par l'IA ②.\n//   1. masque les termes identifiants connus (nom, ville, employeurs, écoles…)\n//   2. remplace les pronoms genrés par « ce profil »\n//   3. calcule les tailles d'entreprise (l'IA ne les décide pas)\n//   4. signale les pourcentages absents du CV\n//   5. liste tout ce qui a été corrigé dans alertes_rgpd\n// ═══════════════════════════════════════════════════════════════════════\n\n// ─── Outil : échapper les caractères spéciaux d'un terme avant de le mettre\n//     dans un regex (équivalent de re.escape en Python).\nconst echapper = (s) => s.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n\n// ─── 1. MASQUER : remplace chaque terme interdit par [confidentiel] ─────\n// Renvoie [texte nettoyé, liste des termes trouvés]\nfunction masquer(texte, termes) {\n  const trouves = [];\n  for (const terme of termes) {\n    // Mot entier uniquement : « Tours » ne doit pas matcher dans « retours ».\n    // \\p{L}\\p{N} + flag u : lettres et chiffres accents compris.\n    // Flags : g = remplacer partout, i = insensible à la casse, u = unicode.\n    const motif = new RegExp(\n      `(?<![\\\\p{L}\\\\p{N}_])${echapper(terme)}(?![\\\\p{L}\\\\p{N}_])`,\n      'giu'\n    );\n    if (texte.search(motif) !== -1) {            // -1 = pas trouvé\n      trouves.push(terme);\n      texte = texte.replace(motif, '[confidentiel]');\n    }\n  }\n  return [texte, trouves];\n}\n\n// ─── 2. NEUTRALISER : pronoms genrés → « ce profil » ────────────────────\nfunction neutraliser(texte) {\n  return texte\n    // « il·elle », « il/elle », « elle/il » → « ce profil »\n    .replace(/(?<![\\p{L}])(il\\s*[·\\/.]\\s*elle|elle\\s*[·\\/.]\\s*il)(?![\\p{L}])/giu, 'ce profil')\n    // « Il a conçu… » en début de phrase → « Ce profil a conçu… »\n    .replace(/(^|[.!?]\\s+)(Il|Elle)\\s/gu, (_, debut) => `${debut}Ce profil `)\n    // « …, il maîtrise » après une virgule ou un point-virgule\n    .replace(/([,;]\\s+)(il|elle)\\s/gu, (_, debut) => `${debut}ce profil `);\n}\n\n// ─── 3. PARCOURIR : applique le contrôle à TOUT le JSON de l'IA ─────────\n// Récursif : texte → on nettoie ; liste ou objet → on redescend ; reste → inchangé.\n// `alertes` est une liste partagée : chaque appel y ajoute ses trouvailles.\nfunction parcourir(valeur, termes, alertes) {\n  if (typeof valeur === 'string') {\n    const [texteMasque, mots] = masquer(valeur, termes);\n    alertes.push(...mots);\n    const texteNeutre = neutraliser(texteMasque);\n    if (texteNeutre !== texteMasque) alertes.push('pronom genré → « ce profil »');\n    return texteNeutre;\n  } else if (Array.isArray(valeur)) {\n    return valeur.map((x) => parcourir(x, termes, alertes));\n  } else if (valeur !== null && typeof valeur === 'object') {\n    return Object.fromEntries(\n      Object.entries(valeur).map(([k, v]) => [k, parcourir(v, termes, alertes)])\n    );\n  } else {\n    return valeur;\n  }\n}\n\n// ─── 4. LISTE DES TERMES INTERDITS ──────────────────────────────────────\n// Ajoute un terme s'il est assez long (≥ 3 lettres) et pas déjà présent.\nfunction ajouterSiValide(termes, valeur) {\n  if (typeof valeur === 'string') {\n    valeur = valeur.trim();\n    if (valeur.length >= 3 && !termes.includes(valeur)) termes.push(valeur);\n  }\n}\n\n// Les termes viennent de « Préparer le dossier » :\n// toute l'identité + employeurs, lieux et écoles du profil.\nfunction construireTermes(identite, profil) {\n  const termes = [];\n  for (const v of Object.values(identite)) ajouterSiValide(termes, v);\n\n  for (const exp of profil.experiences ?? []) {\n    for (const champ of ['entreprise', 'lieu']) {\n      ajouterSiValide(termes, exp[champ] ?? '');\n    }\n    // « Nom (SIGLE) » → on protège aussi « Nom » et « SIGLE » séparément.\n    const m = (exp.entreprise ?? '').match(/^(.*?)\\s*\\(([^)]+)\\)\\s*$/);\n    if (m) { ajouterSiValide(termes, m[1]); ajouterSiValide(termes, m[2]); }\n  }\n\n  for (const f of profil.formations ?? []) {\n    ajouterSiValide(termes, f.etablissement ?? '');\n  }\n  return termes;\n}\n\n// ─── 5. TAILLE D'ENTREPRISE : calculée par le code, jamais par l'IA ─────\nconst TRANCHES = [50, 100, 200, 500, 1000, 2000, 5000, 10000];\nconst millier = (n) => String(n).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ' ');\n\n// Lit un effectif (« 2 300 collaborateurs », « 180 salariés ») → tranche, ou null\nfunction tailleOfficielle(description) {\n  const m = String(description ?? '').match(/(\\d[\\d\\s\\u00a0\\u202f]*)\\s*(salariés|collaborateurs|employés)/i);\n  if (!m) return null;                                        // pas d'effectif → pas de taille\n  const n = Number(m[1].replace(/\\D/g, ''));\n  const t = [...TRANCHES].reverse().find((x) => x <= n);      // plus haute tranche ≤ n\n  return t ? `${millier(t)}+ collaborateurs` : null;\n}\n\n// ─── 6. POURCENTAGES INVENTÉS : tout « N % » de l'accroche absent du CV est signalé ───\nfunction signalerPourcentages(accroche, profil, alertes) {\n  const source = JSON.stringify(profil ?? {}).replace(/[\\s\\u00a0\\u202f]/g, '');\n  for (const p of String(accroche ?? '').match(/\\d+(?:[.,]\\d+)?\\s*%/g) ?? []) {\n    if (!source.includes(p.replace(/[\\s\\u00a0\\u202f]/g, ''))) {\n      alertes.push(`pourcentage absent du CV : ${p} (à relire)`);\n    }\n  }\n}\n\n// ─── 7. PROGRAMME PRINCIPAL ─────────────────────────────────────────────\n// Le dossier (code CONS, identité, profil) vient de « Préparer le dossier »,\n// lu par son nom. La sortie de l'IA ② arrive par le fil : $json.output.\nconst dossier = $('Préparer le dossier').first().json;\nconst brouillon = $json.output;\nconst sources = dossier.profil?.experiences ?? [];\n\nconst termes = construireTermes(dossier.identite ?? {}, dossier.profil ?? {});\nconst alertes = [];\nconst propre = parcourir(brouillon, termes, alertes);\n\n// Secteur : on garde le mot choisi par l'IA, la taille vient du code.\n// Les expériences gardent leur ordre : on vérifie que le nombre colle.\nif ((propre.experiences ?? []).length === sources.length) {\n  propre.experiences.forEach((e, i) => {\n    if (typeof e.secteur !== 'string') return;\n    const secteurSeul = e.secteur.replace(/\\s*[(,].*$/, '').trim();   // avant « ( » ou « , »\n    const taille = tailleOfficielle(sources[i].description_entreprise);\n    const nouveau = taille ? `${secteurSeul} (${taille})` : secteurSeul;\n    if (nouveau !== e.secteur) alertes.push(`secteur corrigé : « ${e.secteur} » → « ${nouveau} »`);\n    e.secteur = nouveau;\n  });\n}\n\n// Pourcentages de l'accroche absents du CV d'origine\nsignalerPourcentages(propre.accroche, dossier.profil, alertes);\n\nreturn {\n  json: {\n    ...dossier,                              // on garde code_consultant, identite, profil\n    cv_anonyme: propre,                      // le CV nettoyé, prêt pour la mise en page\n    alertes_rgpd: [...new Set(alertes)],     // tout ce qui a été corrigé, sans doublons\n  },\n};"
+        "jsCode": "// ═══════════════════════════════════════════════════════════════════════\n//  Nœud Code « Contrôle RGPD » : mode « Run Once for Each Item »\n//  Rôle : filet de sécurité SANS IA, après la rédaction par l'IA ②.\n//   1. masque les termes identifiants connus (nom, ville, employeurs, écoles…)\n//   2. remplace les pronoms genrés par « ce profil »\n//   3. calcule les tailles d'entreprise (l'IA ne les décide pas)\n//   4. signale les pourcentages absents du CV\n//   5. liste tout ce qui a été corrigé dans alertes_rgpd\n// ═══════════════════════════════════════════════════════════════════════\n\n// ─── Outil : échapper les caractères spéciaux d'un terme avant de le mettre\n//     dans un regex (équivalent de re.escape en Python).\nconst echapper = (s) => s.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n\n// ─── 1. MASQUER : remplace chaque terme interdit par [confidentiel] ─────\n// Renvoie [texte nettoyé, liste des termes trouvés]\nfunction masquer(texte, termes) {\n  const trouves = [];\n  for (const terme of termes) {\n    // Mot entier uniquement : « Tours » ne doit pas matcher dans « retours ».\n    // \\p{L}\\p{N} + flag u : lettres et chiffres accents compris.\n    // Flags : g = remplacer partout, i = insensible à la casse, u = unicode.\n    const motif = new RegExp(\n      `(?<![\\\\p{L}\\\\p{N}_])${echapper(terme)}(?![\\\\p{L}\\\\p{N}_])`,\n      'giu'\n    );\n    if (texte.search(motif) !== -1) {            // -1 = pas trouvé\n      trouves.push(terme);\n      texte = texte.replace(motif, '[confidentiel]');\n    }\n  }\n  return [texte, trouves];\n}\n\n// ─── 2. NEUTRALISER : pronoms genrés → « ce profil » ────────────────────\nfunction neutraliser(texte) {\n  return texte\n    // « il·elle », « il/elle », « elle/il » → « ce profil »\n    .replace(/(?<![\\p{L}])(il\\s*[·\\/.]\\s*elle|elle\\s*[·\\/.]\\s*il)(?![\\p{L}])/giu, 'ce profil')\n    // « Il a conçu… » en début de phrase → « Ce profil a conçu… »\n    .replace(/(^|[.!?]\\s+)(Il|Elle)\\s/gu, (_, debut) => `${debut}Ce profil `)\n    // « …, il maîtrise » après une virgule ou un point-virgule\n    .replace(/([,;]\\s+)(il|elle)\\s/gu, (_, debut) => `${debut}ce profil `);\n}\n\n// ─── 3. PARCOURIR : applique le contrôle à TOUT le JSON de l'IA ─────────\n// Récursif : texte → on nettoie ; liste ou objet → on redescend ; reste → inchangé.\n// `alertes` est une liste partagée : chaque appel y ajoute ses trouvailles.\nfunction parcourir(valeur, termes, alertes) {\n  if (typeof valeur === 'string') {\n    const [texteMasque, mots] = masquer(valeur, termes);\n    alertes.push(...mots);\n    const texteNeutre = neutraliser(texteMasque);\n    if (texteNeutre !== texteMasque) alertes.push('pronom genré → « ce profil »');\n    return texteNeutre;\n  } else if (Array.isArray(valeur)) {\n    return valeur.map((x) => parcourir(x, termes, alertes));\n  } else if (valeur !== null && typeof valeur === 'object') {\n    return Object.fromEntries(\n      Object.entries(valeur).map(([k, v]) => [k, parcourir(v, termes, alertes)])\n    );\n  } else {\n    return valeur;\n  }\n}\n\n// ─── 4. LISTE DES TERMES INTERDITS ──────────────────────────────────────\n// Ajoute un terme s'il est assez long (≥ 3 lettres) et pas déjà présent.\nfunction ajouterSiValide(termes, valeur) {\n  if (typeof valeur === 'string') {\n    valeur = valeur.trim();\n    if (valeur.length >= 3 && !termes.includes(valeur)) termes.push(valeur);\n  }\n}\n\n// Les termes viennent de « Préparer le dossier » :\n// toute l'identité + employeurs, lieux et écoles du profil.\nfunction construireTermes(identite, profil) {\n  const termes = [];\n  for (const v of Object.values(identite).flat()) ajouterSiValide(termes, v);\n\n  for (const exp of profil.experiences ?? []) {\n    for (const champ of ['entreprise', 'lieu']) {\n      ajouterSiValide(termes, exp[champ] ?? '');\n    }\n    // « Nom (SIGLE) » → on protège aussi « Nom » et « SIGLE » séparément.\n    const m = (exp.entreprise ?? '').match(/^(.*?)\\s*\\(([^)]+)\\)\\s*$/);\n    if (m) { ajouterSiValide(termes, m[1]); ajouterSiValide(termes, m[2]); }\n  }\n\n  for (const f of profil.formations ?? []) {\n    ajouterSiValide(termes, f.etablissement ?? '');\n  }\n  return termes;\n}\n\n// ─── 5. TAILLE D'ENTREPRISE : calculée par le code, jamais par l'IA ─────\nconst TRANCHES = [50, 100, 200, 500, 1000, 2000, 5000, 10000];\nconst millier = (n) => String(n).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ' ');\n\n// Lit un effectif (« 2 300 collaborateurs », « 180 salariés ») → tranche, ou null\nfunction tailleOfficielle(description) {\n  const m = String(description ?? '').match(/(\\d[\\d\\s\\u00a0\\u202f]*)\\s*(salariés|collaborateurs|employés)/i);\n  if (!m) return null;                                        // pas d'effectif → pas de taille\n  const n = Number(m[1].replace(/\\D/g, ''));\n  const t = [...TRANCHES].reverse().find((x) => x <= n);      // plus haute tranche ≤ n\n  return t ? `${millier(t)}+ collaborateurs` : null;\n}\n\n// ─── 6. POURCENTAGES INVENTÉS : tout « N % » de l'accroche absent du CV est signalé ───\nfunction signalerPourcentages(accroche, profil, alertes) {\n  const source = JSON.stringify(profil ?? {}).replace(/[\\s\\u00a0\\u202f]/g, '');\n  for (const p of String(accroche ?? '').match(/\\d+(?:[.,]\\d+)?\\s*%/g) ?? []) {\n    if (!source.includes(p.replace(/[\\s\\u00a0\\u202f]/g, ''))) {\n      alertes.push(`pourcentage absent du CV : ${p} (à relire)`);\n    }\n  }\n}\n\n// ─── 7. PROGRAMME PRINCIPAL ─────────────────────────────────────────────\n// Le dossier (code CONS, identité, profil) vient de « Préparer le dossier »,\n// lu par son nom. La sortie de l'IA ② arrive par le fil : $json.output.\nconst dossier = $('Préparer le dossier').first().json;\nconst brouillon = $json.output;\nconst sources = dossier.profil?.experiences ?? [];\n\nconst termes = construireTermes(dossier.identite ?? {}, dossier.profil ?? {});\nconst alertes = [];\nconst propre = parcourir(brouillon, termes, alertes);\n\n// Secteur : on garde le mot choisi par l'IA, la taille vient du code.\n// Les expériences gardent leur ordre : on vérifie que le nombre colle.\nif ((propre.experiences ?? []).length === sources.length) {\n  propre.experiences.forEach((e, i) => {\n    if (typeof e.secteur !== 'string') return;\n    const secteurSeul = e.secteur.replace(/\\s*[(,].*$/, '').trim();   // avant « ( » ou « , »\n    const taille = tailleOfficielle(sources[i].description_entreprise);\n    const nouveau = taille ? `${secteurSeul} (${taille})` : secteurSeul;\n    if (nouveau !== e.secteur) alertes.push(`secteur corrigé : « ${e.secteur} » → « ${nouveau} »`);\n    e.secteur = nouveau;\n  });\n}\n\n// Pourcentages de l'accroche absents du CV d'origine\nsignalerPourcentages(propre.accroche, dossier.profil, alertes);\n\nreturn {\n  json: {\n    ...dossier,                              // on garde code_consultant, identite, profil\n    cv_anonyme: propre,                      // le CV nettoyé, prêt pour la mise en page\n    alertes_rgpd: [...new Set(alertes)],     // tout ce qui a été corrigé, sans doublons\n  },\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1760,
-        0
+        2032,
+        208
       ],
-      "id": "a3159293-45de-4582-8c5e-60b28204a290",
+      "id": "5b71efa6-8e37-47e8-a6ce-a2ff6b09edbe",
       "name": "Contrôle RGPD"
     },
     {
@@ -302,10 +271,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1680,
-        -192
+        1968,
+        16
       ],
-      "id": "2fd8bdbe-a639-47ee-9c02-fd7b6d58f740",
+      "id": "84f12c36-e090-40b6-9189-6d2a1949b9b1",
       "name": "Sticky Note4"
     },
     {
@@ -335,10 +304,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        400,
-        64
+        384,
+        272
       ],
-      "id": "391a92f5-55c0-4d74-89e5-bde5878220a8",
+      "id": "48b4dc9a-fb86-4aa2-8d7a-d05d01052cf5",
       "name": "DOCX to PDF"
     },
     {
@@ -349,10 +318,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1984,
-        0
+        2208,
+        368
       ],
-      "id": "6b7e2464-af61-46f2-a0a6-255ef515ba63",
+      "id": "7eb21bbe-7bd1-4116-bbd1-494dd9415345",
       "name": "Mise en page HTML"
     },
     {
@@ -387,10 +356,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        2432,
-        112
+        432,
+        816
       ],
-      "id": "6a939920-549e-4b72-ac21-e509f5a622b8",
+      "id": "5392b1e8-f2aa-45e2-9430-4a62e05b46cc",
       "name": "HTML to PDF"
     },
     {
@@ -405,10 +374,10 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.2,
       "position": [
-        2208,
-        112
+        208,
+        816
       ],
-      "id": "f179d220-9e61-43f7-8d3a-5e282f71cdb7",
+      "id": "e4cf5931-aa51-4825-bc52-fd249cb63158",
       "name": "HTML to Text File"
     },
     {
@@ -422,26 +391,11 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1.1,
       "position": [
-        2656,
-        112
+        656,
+        816
       ],
-      "id": "94fb3e27-7272-4cf8-b753-374992aad302",
+      "id": "2012ef22-823a-4367-8eec-b95c8ff99ed1",
       "name": "Sauvegarde du CV anonyme"
-    },
-    {
-      "parameters": {
-        "mode": "raw",
-        "jsonOutput": "={\n  \"code_consultant\": {{ JSON.stringify($json.code_consultant) }},\n  \"date_traitement\": {{ JSON.stringify($now.format('dd/MM/yyyy')) }},\n  \"prenom\": {{ JSON.stringify($json.identite?.prenom ?? '') }},\n  \"nom\": {{ JSON.stringify($json.identite?.nom ?? '') }},\n  \"email\": {{ JSON.stringify($json.identite?.email ?? '') }},\n  \"telephone\": {{ JSON.stringify($json.identite?.telephone ?? '') }},\n  \"adresse\": {{ JSON.stringify($json.identite?.adresse ?? $json.identite?.ville ?? '') }},\n  \"liens\": {{ JSON.stringify([$json.identite?.linkedin, ...($json.identite?.autres_liens ?? [])].filter(Boolean).join(', ')) }},\n  \"titre\": {{ JSON.stringify($json.cv_anonyme?.titre ?? '') }},\n  \"annees_experience\": {{ JSON.stringify($json.cv_anonyme?.annees_experience ?? 0) }},\n  \"competences\": {{ JSON.stringify(($json.cv_anonyme?.competences_techniques ?? []).join(', ')) }},\n  \"lien_cv_anonyme\": {{ JSON.stringify($json.code_consultant + '.pdf') }},\n  \"fichier_source\": {{ JSON.stringify($('Formulaire dépose CV').first().json.cv?.filename ?? '') }},\n  \"alertes_rgpd\": {{ JSON.stringify(($json.alertes_rgpd ?? []).length) }}\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.5,
-      "position": [
-        2432,
-        -112
-      ],
-      "id": "038a6d76-1ddb-4ad8-99f3-bb142f780e27",
-      "name": "Ligne du registre"
     },
     {
       "parameters": {
@@ -493,33 +447,34 @@
             {
               "name": "alertes_rgpd",
               "type": "number"
+            },
+            {
+              "name": "alertes_detail"
             }
           ]
         },
         "options": {
-          "createIfNotExists": "={ \"createIfNotExists\": true }"
+          "createIfNotExists": true
         }
       },
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        2208,
-        -112
+        288,
+        1072
       ],
-      "id": "5fdad0a9-7cd7-4951-92f6-01815209376e",
+      "id": "d4b56e9b-5244-4971-a94e-ea9072f14b20",
       "name": "Crée la table (si elle n'existe pas)"
     },
     {
       "parameters": {
         "dataTableId": {
           "__rl": true,
-          "value": "rqEs1EOJv1NmgvZt",
-          "mode": "list",
-          "cachedResultName": "registre_consultants",
-          "cachedResultUrl": "/projects/FlC2xNItItSMyWe9/datatables/rqEs1EOJv1NmgvZt"
+          "value": "registre_consultants",
+          "mode": "name"
         },
         "columns": {
-          "mappingMode": "defineBelow",
+          "mappingMode": "autoMapInputData",
           "value": {},
           "matchingColumns": [],
           "schema": [
@@ -539,7 +494,7 @@
               "required": false,
               "defaultMatch": false,
               "display": true,
-              "type": "dateTime",
+              "type": "string",
               "readOnly": false,
               "removed": false
             },
@@ -659,7 +614,7 @@
               "required": false,
               "defaultMatch": false,
               "display": true,
-              "type": "string",
+              "type": "number",
               "readOnly": false,
               "removed": false
             }
@@ -672,38 +627,246 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        2656,
-        -112
+        736,
+        1072
       ],
-      "id": "45d483bf-71dc-4919-a058-b2cd39e6b115",
+      "id": "58d90340-cf45-48ea-9d2a-2bf724a4db8d",
       "name": "Inserer la ligne"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Adresse n8n\nconst URL_N8N = 'http://localhost:5678';\n\nconst d = $('Mise en page HTML').first().json;\nconst identite = d.identite ?? {};\nconst cv = d.cv_anonyme ?? {};\nconst alertes = d.alertes_rgpd ?? [];\n\n// \"jean-pierre\" -> \"Jean-Pierre\" ; \"d'artagnan\" -> \"D'Artagnan\"\nconst capitaliser = (s) =>\n  (s ?? '').trim().toLocaleLowerCase('fr')\n    .replace(/(^|[\\s'’-])(\\p{L})/gu, (m, sep, lettre) => sep + lettre.toLocaleUpperCase('fr'));\n\n// Une alerte peut être un texte ou un objet : on gère les deux\nconst alerteEnTexte = (a) => (typeof a === 'string' ? a : JSON.stringify(a));\n\nreturn {\n  json: {\n    code_consultant: d.code_consultant,\n    date_traitement: $now.toFormat('dd/MM/yyyy'),\n    prenom: capitaliser(identite.prenom),\n    nom: (identite.nom ?? '').trim().toLocaleUpperCase('fr'),\n    email: (identite.email ?? '').trim().toLowerCase(),\n    telephone: identite.telephone ?? '',\n    adresse: identite.adresse || identite.ville || '',\n    liens: [identite.linkedin, ...(identite.autres_liens ?? [])].filter(Boolean).join(', '),\n    titre: cv.titre ?? '',\n    annees_experience: Number(cv.annees_experience) || 0,\n    competences: (cv.competences_techniques ?? []).join(', '),\n    lien_cv_anonyme: `${URL_N8N}/webhook/cv-anonyme?code=${d.code_consultant}`,\n    fichier_source: $('Formulaire dépose CV').first().json.cv?.filename ?? '',\n    alertes_rgpd: alertes.length,\n    alertes_detail: alertes.map(alerteEnTexte).join(' ; '),\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        1072
+      ],
+      "id": "29d074da-74c6-4b06-a39e-2d2e3378307a",
+      "name": "Ligne du registre"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "registre_consultants",
+          "mode": "name"
+        },
+        "returnAll": true,
+        "orderBy": true,
+        "orderByDirection": "ASC"
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        1072
+      ],
+      "id": "1c971ada-77b5-42b1-a5e0-83a97f757b06",
+      "name": "Lire le registre"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Renomme les colonnes techniques en en-têtes lisibles pour le fichier Excel\n// et jette les colonnes internes de la table (id, createdAt, updatedAt).\nreturn $input.all().map((item) => {\n  const r = item.json;\n  return {\n    json: {\n      'Code consultant': r.code_consultant,\n      'Date de traitement': r.date_traitement,\n      'Prénom': r.prenom,\n      'Nom': r.nom,\n      'E-mail': r.email,\n      'Téléphone': r.telephone,\n      'Adresse': r.adresse,\n      'Liens (LinkedIn, GitHub…)': r.liens,\n      'Poste': r.titre,\n      \"Années d'expérience\": r.annees_experience,\n      'Compétences': r.competences,\n      'Lien CV anonymisé': r.lien_cv_anonyme,\n      'Fichier source': r.fichier_source,\n      'Alertes RGPD': r.alertes_rgpd,\n      'Détails alertes': r.alertes_detail\n    },\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        1072
+      ],
+      "id": "a6249510-c120-4959-b096-edfb6c580878",
+      "name": "Nom colonnes Excel"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "Registre CV"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.2,
+      "position": [
+        1344,
+        1072
+      ],
+      "id": "0f0ee583-064c-4d6e-a3dc-b21552681e77",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "# Report",
+        "height": 704,
+        "width": 624,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1776,
+        640
+      ],
+      "id": "1b981f46-d14f-408a-9a5f-cf9d8f36c428",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('Mise en page HTML').first().json;\nconst n = (d.alertes_rgpd ?? []).length;\n\nconst alertes = n === 0\n  ? 'Aucune correction automatique du contrôle RGPD.'\n  : `${n} correction(s) automatique(s) du contrôle RGPD : à relire.`;\n\nreturn {\n  json: {\n    titre: `CV anonymisé : ${d.code_consultant}`,\n    message: [\n      `Le CV anonymisé est enregistré : ${d.code_consultant}.pdf`,\n      'Le registre interne est à jour (table et fichier Excel).',\n      alertes,\n    ].join('<br>'),\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        896
+      ],
+      "id": "0e8c9798-975b-44f1-8d41-f188a2308aa2",
+      "name": "Page de fin OK"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('Mise en page HTML').first().json;\nconst e = $json.error;\nconst raison = typeof e === 'string' ? e : (e?.message ?? 'raison inconnue');\n\nreturn {\n  json: {\n    titre: `CV anonymisé : ${d.code_consultant} (Excel non mis à jour)`,\n    message: [\n      `Le CV anonymisé est enregistré : ${d.code_consultant}.pdf`,\n      'La ligne est bien dans la table du registre.',\n      \"Mais le fichier Excel n'a pas pu être écrit (est-il ouvert dans Excel ?).\",\n      'Ferme-le : le prochain CV déposé le régénérera en entier.',\n      `Détail technique : ${raison}`,\n    ].join('<br>'),\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1888,
+        1088
+      ],
+      "id": "b8a39c7d-f0db-4b4a-9f3d-0c313f407254",
+      "name": "Page de fin erreur Excel"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "={{ $json.titre }}",
+        "completionMessage": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        2144,
+        992
+      ],
+      "id": "d4aed055-acc3-4bb5-8b63-7a08ffd6efb6",
+      "name": "Page de fin (affichage)",
+      "webhookId": "bad5adc1-90c3-4246-b3b5-a18859ab14ac"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/files/registre_consultants.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        1536,
+        1072
+      ],
+      "id": "be584838-e438-455d-9cc2-e649a30cd84b",
+      "name": "Sauvegarde du Excel",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "705e285a-638a-4274-8688-d28284f2c596",
+              "leftValue": "={{ $json.cv.mimetype }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        240,
+        144
+      ],
+      "id": "7d2f79b0-355b-45d1-a822-fef44bf78666",
+      "name": "PDF ou DOCX ?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "6fe38ae2-d661-451a-bc4f-7ff205eda077",
+              "leftValue": "={{ ($json.text || '').trim().length }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        720,
+        128
+      ],
+      "id": "df529241-a061-490c-a1cc-86c87775437e",
+      "name": "Texte ?"
+    },
+    {
+      "parameters": {
+        "binaryProperty": "cv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mistralAi",
+      "typeVersion": 1,
+      "position": [
+        880,
+        288
+      ],
+      "id": "d6c33573-f1c2-4fda-8427-0da7243347b4",
+      "name": "Extract text",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "MHVFu2Gtpa8W7zfz",
+          "name": "Mistral Cloud account"
+        }
+      }
     }
   ],
   "pinData": {},
   "connections": {
-    "PDF ou DOCX": {
-      "main": [
-        [
-          {
-            "node": "Extract from PDF",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "DOCX to PDF",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Formulaire dépose CV": {
       "main": [
         [
           {
-            "node": "PDF ou DOCX",
+            "node": "PDF ou DOCX ?",
             "type": "main",
             "index": 0
           }
@@ -725,7 +888,7 @@
       "main": [
         [
           {
-            "node": "Extraction des infos du CV",
+            "node": "Texte ?",
             "type": "main",
             "index": 0
           }
@@ -816,11 +979,6 @@
             "node": "HTML to Text File",
             "type": "main",
             "index": 0
-          },
-          {
-            "node": "Crée la table (si elle n'existe pas)",
-            "type": "main",
-            "index": 0
           }
         ]
       ]
@@ -847,17 +1005,6 @@
         ]
       ]
     },
-    "Ligne du registre": {
-      "main": [
-        [
-          {
-            "node": "Inserer la ligne",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Crée la table (si elle n'existe pas)": {
       "main": [
         [
@@ -871,7 +1018,155 @@
     },
     "Inserer la ligne": {
       "main": [
-        []
+        [
+          {
+            "node": "Lire le registre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ligne du registre": {
+      "main": [
+        [
+          {
+            "node": "Inserer la ligne",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lire le registre": {
+      "main": [
+        [
+          {
+            "node": "Nom colonnes Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nom colonnes Excel": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Sauvegarde du Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sauvegarde du CV anonyme": {
+      "main": [
+        [
+          {
+            "node": "Crée la table (si elle n'existe pas)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page de fin OK": {
+      "main": [
+        [
+          {
+            "node": "Page de fin (affichage)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page de fin erreur Excel": {
+      "main": [
+        [
+          {
+            "node": "Page de fin (affichage)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sauvegarde du Excel": {
+      "main": [
+        [
+          {
+            "node": "Page de fin OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Page de fin erreur Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF ou DOCX ?": {
+      "main": [
+        [
+          {
+            "node": "Extract from PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DOCX to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Texte ?": {
+      "main": [
+        [
+          {
+            "node": "Extraction des infos du CV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract text": {
+      "main": [
+        [
+          {
+            "node": "Extraction des infos du CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -880,12 +1175,11 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "aeb8d6c5-ee57-41a3-a2bc-554b6add3f2d",
+  "versionId": "de59f588-1062-4864-96e9-2cfc53bd92fa",
   "meta": {
-    "templateCredsSetupCompleted": true,
     "instanceId": "4a14aa3c83848608319aa9494f286544e462c72f3a3d72f4d2dacb38f380c838"
   },
   "nodeGroups": [],
-  "id": "A78r64DXTWglRllj",
+  "id": "yQkAmWeIX1vrtTQ9",
   "tags": []
 }

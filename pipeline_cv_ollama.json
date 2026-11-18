@@ -1,0 +1,1214 @@
+{
+  "name": "pipeline_cv_ollama",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Dépôt du CV",
+        "formDescription": "Déposez ici le CV que vous souhaitez anonymiser\nNE PAS FERMER CETTE FENETRE",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "CV du candidat",
+              "fieldType": "file",
+              "fieldName": "cv",
+              "multipleFiles": false,
+              "acceptFileTypes": ".pdf, .docx",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -160,
+        -240
+      ],
+      "id": "e4c44bea-dfbe-4dd2-b4e2-4fc7506fa3ae",
+      "name": "Formulaire dépose CV",
+      "webhookId": "fc0eacc5-1de1-4153-8046-dfb22cc23573"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text ?? $json.extractedText ?? ($json.pages ?? []).map(p => p.markdown).join('\\n\\n') }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"identite\": {\n    \"prenom\": \"Jean\",\n    \"nom\": \"Dupont\",\n    \"email\": \"jean.dupont@exemple.fr\",\n    \"telephone\": \"06 12 34 56 78\",\n    \"adresse\": \"12 rue des Lilas, 37000 Tours\",\n    \"ville\": \"Tours\",\n    \"code_postal\": \"37000\",\n    \"linkedin\": \"https://www.linkedin.com/in/exemple\",\n    \"autres_liens\": [\"https://github.com/exemple\"]\n  },\n  \"titre\": \"Data Analyst\",\n  \"annees_experience\": 5,\n  \"competences_techniques\": [\"SQL\", \"Power BI\", \"Python (pandas)\"],\n  \"savoir_etre\": [\"Pédagogie\", \"Rigueur\"],\n  \"experiences\": [\n    {\n      \"poste\": \"Data Analyst\",\n      \"entreprise\": \"Nom exact de l'employeur\",\n      \"description_entreprise\": \"Banque régionale, 2 300 collaborateurs\",\n      \"lieu\": \"Ville\",\n      \"debut\": \"sept. 2022\",\n      \"fin\": \"aujourd'hui\",\n      \"missions\": [\"Conception de tableaux de bord\", \"Automatisation de reportings\"],\n      \"environnement\": [\"Power BI\", \"SQL Server\", \"Python\"]\n    }\n  ],\n  \"formations\": [\n    { \"diplome\": \"Master MIAGE\", \"etablissement\": \"Nom de l'université\", \"annee\": \"2019\" }\n  ],\n  \"langues\": [{ \"langue\": \"Anglais\", \"niveau\": \"courant\" }],\n  \"certifications\": [\"Nom de la certification (année)\"]\n}",
+        "options": {
+          "systemPromptTemplate": "You are an HR assistant at a consulting firm. You receive the raw text of a CV, extracted from a PDF (the layout may be messy). Your mission: extract the information FAITHFULLY into the requested JSON structure.\n\nRules:\n- Do not invent, infer, summarize or rephrase anything. Copy values as written in the CV, in their original language (French). Do not translate.\n- If a piece of information is missing, return an empty string \"\" (or an empty array []). Never fill a gap with a guess.\n- \"identite\" contains only the candidate's own personal data. Never use the contact details of references or other people.\n- \"adresse\": the full postal address as written (street, postal code, city).\n- \"annees_experience\": if the CV states a number of years of experience, copy it. Otherwise estimate the total years of professional experience, internships excluded, as an integer.\n- \"description_entreprise\": copy the line describing the employer (sector, size) exactly as written, if present.\n- \"competences_techniques\" and \"savoir_etre\": keep tools, technologies and methods separate from soft skills, following the CV's own sections when they exist.\n- \"environnement\": the technologies listed for each position.\n- \"langues\": copy the level as written, including any detail (e.g. \"courant (TOEIC 905)\").\n- \"certifications\": keep the exact name and the year if one is given.\n- Keep the exact names of employers, places and schools: they are handled later in the pipeline.\n- Ignore hobbies, interests, volunteering and references: do not extract them."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        -272
+      ],
+      "id": "edb15036-e483-4f66-a1fd-4c3344d8b91b",
+      "name": "Extraction des infos du CV",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "cv",
+        "options": {
+          "keepSource": "binary"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        -256
+      ],
+      "id": "e5656820-3fb9-47b0-b797-5ff5460ca95a",
+      "name": "Extract from PDF"
+    },
+    {
+      "parameters": {
+        "content": "# Extract",
+        "height": 640,
+        "width": 1360,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        -384
+      ],
+      "id": "71cad1d3-6bb6-4b02-b913-f2a8e55b95aa",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Transform",
+        "height": 640,
+        "width": 1040
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        -384
+      ],
+      "id": "aefc59ca-eb01-4860-8c84-ca1eef6f2407",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "# Load",
+        "height": 688,
+        "width": 1776,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        256
+      ],
+      "id": "5613cee3-e1f4-4fa6-b058-05b1c899977d",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "495aff69-c20b-4286-b026-a72a6fc5ae70",
+              "name": "code_consultant",
+              "value": "={{ 'CONS-' + Array.from({length: 6}, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('') }}",
+              "type": "string"
+            },
+            {
+              "id": "1e09b1d4-de0c-4d51-b647-9f0323fd4ed2",
+              "name": "identite",
+              "value": "={{ $json.output.identite }}",
+              "type": "object"
+            },
+            {
+              "id": "070a7a9f-f982-4d42-8f2c-8c9577518276",
+              "name": "profil",
+              "value": "={{ (({ identite, ...reste }) => reste)($json.output) }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1216,
+        -176
+      ],
+      "id": "ae840b50-9fa6-43c1-ace8-ab2798a24b87",
+      "name": "Préparer le dossier"
+    },
+    {
+      "parameters": {
+        "content": "Sépare identité et profil\nFabrique l'ID\nMémorise le JSON pour la suite",
+        "height": 96,
+        "width": 192,
+        "color": "#FFFFFF"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        -16
+      ],
+      "id": "935df73a-c851-4613-a131-42681844952a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify($json.profil, null, 2) }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You write the ANONYMIZED skills profile of a consultant, to be sent to a client. It must make the client want to meet this profile, WITHOUT ever allowing the person to be identified. You receive the professional profile as JSON and return the requested JSON structure, written in French.\n\n# A. ANONYMIZATION (mandatory, highest priority)\n1. Leave out every identifying element: name, e-mail, phone, address, links, age, birth date, nationality, family status, and every place name (city, region), including inside missions.\n2. Employer: replace it with ONE sector from this list: Banque, Assurance, Mutuelle / santé, Industrie, Commerce / e-commerce, Secteur public, ESN / conseil, Télécoms, Énergie, Transport / logistique, Éducation / recherche. Pick the broad sector, never a niche that could locate the company (e.g. watchmaking).\n3. Employer: write the sector alone, without any size or number (e.g. \"Banque\", \"Secteur public\"). The headcount is added afterwards by the pipeline.\n4. Members, policyholders, clients or users of the employer (sociétaires, adhérents, clients, utilisateurs) are not a headcount. Round them to an order of magnitude (\"450 000 sociétaires\" -> \"plusieurs centaines de milliers de sociétaires\"), in the accroche and in the missions, never in the \"secteur\" field.\n5. Schools and universities: replace with their type (\"Université\", \"École d'ingénieurs\", \"IUT\"). Omit the baccalauréat when a higher diploma exists.\n6. Periods: years only (\"2020 – 2022\", \"2019\", \"2022 – aujourd'hui\").\n\n# B. CONTENT: only what the profile says\n- Reformulate, do not add. Every fact, figure, skill level and link between two facts must come from the profile. Results and before/after comparisons are copied word for word from the profile, with its own numbers. A skill marked \"notions\" stays \"notions\".\n- Never compute anything: no percentage, no total, no sum of counts. Add no qualifier that is not written. Make no causal link (\"grâce à\", \"permis de\") unless the profile states it.\n- Ignore hobbies, volunteering and references.\n- \"accroche\": 2 to 4 plain sentences: experience level, main expertise, sectors, main tools, one or two figured achievements taken from the profile. If in doubt, be plainer.\n- \"titre\": the job title, with the level if relevant (junior, confirmé·e, senior).\n- \"competences_techniques\" and \"competences_transverses\": keep ALL of them.\n- \"experiences\": keep the order; \"secteur\" replaces the employer; \"environnement\" lists only technologies, separated by commas.\n- \"formations\" and \"certifications\": keep all (years included), except the baccalauréat.\n- \"langues\": one string per language, formatted \"Langue : niveau (détail)\", with the level and any detail copied exactly from the profile.\n\n# C. STYLE\n- French, third person, inclusive spelling for titles and adjectives (\"consultant·e\", \"confirmé·e\").\n- Every sentence starts with a verb (\"A conçu...\", \"Maîtrise...\") or with \"Ce profil\". No other subject and no personal pronoun."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1440,
+        -176
+      ],
+      "id": "83b55fba-b95a-4b14-a245-2a4048527ae2",
+      "name": "Rédaction du CV anonymisé",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"accroche\": \"Chef de projet confirmé·e avec 10 ans d'expérience dans l'industrie et l'énergie, spécialiste du pilotage de déploiements multi-sites. A piloté 12 projets et ramené les retards de livraison de 20 à 5 jours. Sait fédérer des équipes pluridisciplinaires.\",\n  \"titre\": \"Chef de projet confirmé·e\",\n  \"annees_experience\": 10,\n  \"competences_techniques\": [\"MS Project\", \"Primavera P6\", \"Excel (avancé)\", \"SAP PS (notions)\", \"Gestion budgétaire\", \"Méthode PRINCE2\"],\n  \"competences_transverses\": [\"Leadership\", \"Sens de l'organisation\"],\n  \"experiences\": [\n    {\n      \"poste\": \"Chef de projet\",\n      \"secteur\": \"Énergie\",\n      \"periode\": \"2018 – aujourd'hui\",\n      \"missions\": [\"Pilotage de 12 projets de déploiement multi-sites\", \"Réduction des retards de livraison de 20 à 5 jours\"],\n      \"environnement\": \"MS Project, Primavera P6, SAP PS\"\n    },\n    {\n      \"poste\": \"Ingénieur travaux\",\n      \"secteur\": \"Industrie\",\n      \"periode\": \"2014 – 2018\",\n      \"missions\": [\"Suivi de chantiers et de sous-traitants\"],\n      \"environnement\": \"MS Project, Excel\"\n    }\n  ],\n  \"formations\": [\n    { \"diplome\": \"Diplôme d'ingénieur, spécialité génie industriel\", \"etablissement_type\": \"École d'ingénieurs\", \"annee\": \"2014\" }\n  ],\n  \"langues\": [\"Italien : courant (C1)\"],\n  \"certifications\": [\"PMP, 2021\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1616,
+        16
+      ],
+      "id": "31a1a8cd-be74-4f82-89af-3e352caffcc8",
+      "name": "Format du CV anonymisé"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ═══════════════════════════════════════════════════════════════════════\n//  Nœud Code « Contrôle RGPD » : mode « Run Once for Each Item »\n//  Rôle : filet de sécurité SANS IA, après la rédaction par l'IA ②.\n//   1. masque les termes identifiants connus (nom, ville, employeurs, écoles…)\n//   2. remplace les pronoms genrés par « ce profil »\n//   3. calcule les tailles d'entreprise (l'IA ne les décide pas)\n//   4. signale les pourcentages absents du CV\n//   5. liste tout ce qui a été corrigé dans alertes_rgpd\n// ═══════════════════════════════════════════════════════════════════════\n\n// ─── Outil : échapper les caractères spéciaux d'un terme avant de le mettre\n//     dans un regex (équivalent de re.escape en Python).\nconst echapper = (s) => s.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n\n// ─── 1. MASQUER : remplace chaque terme interdit par [confidentiel] ─────\n// Renvoie [texte nettoyé, liste des termes trouvés]\nfunction masquer(texte, termes) {\n  const trouves = [];\n  for (const terme of termes) {\n    // Mot entier uniquement : « Tours » ne doit pas matcher dans « retours ».\n    // \\p{L}\\p{N} + flag u : lettres et chiffres accents compris.\n    // Flags : g = remplacer partout, i = insensible à la casse, u = unicode.\n    const motif = new RegExp(\n      `(?<![\\\\p{L}\\\\p{N}_])${echapper(terme)}(?![\\\\p{L}\\\\p{N}_])`,\n      'giu'\n    );\n    if (texte.search(motif) !== -1) {            // -1 = pas trouvé\n      trouves.push(terme);\n      texte = texte.replace(motif, '[confidentiel]');\n    }\n  }\n  return [texte, trouves];\n}\n\n// ─── 2. NEUTRALISER : pronoms genrés → « ce profil » ────────────────────\nfunction neutraliser(texte) {\n  return texte\n    // « il·elle », « il/elle », « elle/il » → « ce profil »\n    .replace(/(?<![\\p{L}])(il\\s*[·\\/.]\\s*elle|elle\\s*[·\\/.]\\s*il)(?![\\p{L}])/giu, 'ce profil')\n    // « Il a conçu… » en début de phrase → « Ce profil a conçu… »\n    .replace(/(^|[.!?]\\s+)(Il|Elle)\\s/gu, (_, debut) => `${debut}Ce profil `)\n    // « …, il maîtrise » après une virgule ou un point-virgule\n    .replace(/([,;]\\s+)(il|elle)\\s/gu, (_, debut) => `${debut}ce profil `);\n}\n\n// ─── 3. PARCOURIR : applique le contrôle à TOUT le JSON de l'IA ─────────\n// Récursif : texte → on nettoie ; liste ou objet → on redescend ; reste → inchangé.\n// `alertes` est une liste partagée : chaque appel y ajoute ses trouvailles.\nfunction parcourir(valeur, termes, alertes) {\n  if (typeof valeur === 'string') {\n    const [texteMasque, mots] = masquer(valeur, termes);\n    alertes.push(...mots);\n    const texteNeutre = neutraliser(texteMasque);\n    if (texteNeutre !== texteMasque) alertes.push('pronom genré → « ce profil »');\n    return texteNeutre;\n  } else if (Array.isArray(valeur)) {\n    return valeur.map((x) => parcourir(x, termes, alertes));\n  } else if (valeur !== null && typeof valeur === 'object') {\n    return Object.fromEntries(\n      Object.entries(valeur).map(([k, v]) => [k, parcourir(v, termes, alertes)])\n    );\n  } else {\n    return valeur;\n  }\n}\n\n// ─── 4. LISTE DES TERMES INTERDITS ──────────────────────────────────────\n// Ajoute un terme s'il est assez long (≥ 3 lettres) et pas déjà présent.\nfunction ajouterSiValide(termes, valeur) {\n  if (typeof valeur === 'string') {\n    valeur = valeur.trim();\n    if (valeur.length >= 3 && !termes.includes(valeur)) termes.push(valeur);\n  }\n}\n\n// Les termes viennent de « Préparer le dossier » :\n// toute l'identité + employeurs, lieux et écoles du profil.\nfunction construireTermes(identite, profil) {\n  const termes = [];\n  for (const v of Object.values(identite).flat()) ajouterSiValide(termes, v);\n\n  for (const exp of profil.experiences ?? []) {\n    for (const champ of ['entreprise', 'lieu']) {\n      ajouterSiValide(termes, exp[champ] ?? '');\n    }\n    // « Nom (SIGLE) » → on protège aussi « Nom » et « SIGLE » séparément.\n    const m = (exp.entreprise ?? '').match(/^(.*?)\\s*\\(([^)]+)\\)\\s*$/);\n    if (m) { ajouterSiValide(termes, m[1]); ajouterSiValide(termes, m[2]); }\n  }\n\n  for (const f of profil.formations ?? []) {\n    ajouterSiValide(termes, f.etablissement ?? '');\n  }\n  return termes;\n}\n\n// ─── 5. TAILLE D'ENTREPRISE : calculée par le code, jamais par l'IA ─────\nconst TRANCHES = [50, 100, 200, 500, 1000, 2000, 5000, 10000];\nconst millier = (n) => String(n).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ' ');\n\n// Lit un effectif (« 2 300 collaborateurs », « 180 salariés ») → tranche, ou null\nfunction tailleOfficielle(description) {\n  const m = String(description ?? '').match(/(\\d[\\d\\s\\u00a0\\u202f]*)\\s*(salariés|collaborateurs|employés)/i);\n  if (!m) return null;                                        // pas d'effectif → pas de taille\n  const n = Number(m[1].replace(/\\D/g, ''));\n  const t = [...TRANCHES].reverse().find((x) => x <= n);      // plus haute tranche ≤ n\n  return t ? `${millier(t)}+ collaborateurs` : null;\n}\n\n// ─── 6. POURCENTAGES INVENTÉS : tout « N % » de l'accroche absent du CV est signalé ───\nfunction signalerPourcentages(accroche, profil, alertes) {\n  const source = JSON.stringify(profil ?? {}).replace(/[\\s\\u00a0\\u202f]/g, '');\n  for (const p of String(accroche ?? '').match(/\\d+(?:[.,]\\d+)?\\s*%/g) ?? []) {\n    if (!source.includes(p.replace(/[\\s\\u00a0\\u202f]/g, ''))) {\n      alertes.push(`pourcentage absent du CV : ${p} (à relire)`);\n    }\n  }\n}\n\n// ─── 7. PROGRAMME PRINCIPAL ─────────────────────────────────────────────\n// Le dossier (code CONS, identité, profil) vient de « Préparer le dossier »,\n// lu par son nom. La sortie de l'IA ② arrive par le fil : $json.output.\nconst dossier = $('Préparer le dossier').first().json;\nconst brouillon = $json.output;\nconst sources = dossier.profil?.experiences ?? [];\n\nconst termes = construireTermes(dossier.identite ?? {}, dossier.profil ?? {});\nconst alertes = [];\nconst propre = parcourir(brouillon, termes, alertes);\n\n// Secteur : on garde le mot choisi par l'IA, la taille vient du code.\n// Les expériences gardent leur ordre : on vérifie que le nombre colle.\nif ((propre.experiences ?? []).length === sources.length) {\n  propre.experiences.forEach((e, i) => {\n    if (typeof e.secteur !== 'string') return;\n    const secteurSeul = e.secteur.replace(/\\s*[(,].*$/, '').trim();   // avant « ( » ou « , »\n    const taille = tailleOfficielle(sources[i].description_entreprise);\n    const nouveau = taille ? `${secteurSeul} (${taille})` : secteurSeul;\n    if (nouveau !== e.secteur) alertes.push(`secteur corrigé : « ${e.secteur} » → « ${nouveau} »`);\n    e.secteur = nouveau;\n  });\n}\n\n// Pourcentages de l'accroche absents du CV d'origine\nsignalerPourcentages(propre.accroche, dossier.profil, alertes);\n\nreturn {\n  json: {\n    ...dossier,                              // on garde code_consultant, identite, profil\n    cv_anonyme: propre,                      // le CV nettoyé, prêt pour la mise en page\n    alertes_rgpd: [...new Set(alertes)],     // tout ce qui a été corrigé, sans doublons\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        -176
+      ],
+      "id": "a3159293-45de-4582-8c5e-60b28204a290",
+      "name": "Contrôle RGPD"
+    },
+    {
+      "parameters": {
+        "content": "Contrôle que l'IA n'ait pas laissé passer d'info RGPD\nRemplace par [confidentiel] les termes exclus.\nLes termes viennent de l'étape \"préparer le dossier\"\nLes termes trouvés sont listés dans alertes_rgpd",
+        "height": 176,
+        "color": "#F7F3F3"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1744,
+        -368
+      ],
+      "id": "2fd8bdbe-a639-47ee-9c02-fd7b6d58f740",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gotenberg:3000/forms/libreoffice/convert",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "files",
+              "inputDataFieldName": "cv"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "cv"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        160,
+        -112
+      ],
+      "id": "391a92f5-55c0-4d74-89e5-bde5878220a8",
+      "name": "DOCX to PDF"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// ═══════════════════════════════════════════════════════════════════════\n//  Nœud Code « Mise en page HTML » : mode « Run Once for Each Item »\n//  Rôle : transformer le CV anonymisé (JSON) en page HTML prête pour Gotenberg.\n//  Palette C : bordeaux #8C2F39 + ardoise #334155\n//  Densité dynamique : le code ESTIME la hauteur du CV (en lignes) et choisit\n//  la plus grande taille de police qui tient sur une page A4.\n//  Toute section sans donnée est supprimée (pas de titre orphelin).\n// ═══════════════════════════════════════════════════════════════════════\nconst NOM_SOCIETE = 'Fil Rouge Consulting';\n\n// ── Réglages de la densité (à ajuster après tests) ─────────────────────\nconst HAUTEUR_MAX = 1050;  // hauteur max estimée (px) pour tenir sur 1 page A4\nconst NB_PALIERS = 9;      // nombre de tailles possibles entre « compact » et « aéré »\n\nconst cv = $json.cv_anonyme;\nconst code = $json.code_consultant;\n\n// Échappe les caractères HTML (sécurité + affichage correct)\nconst esc = (s) => String(s ?? '').replace(/[&<>\"']/g, (c) => (\n  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '\"': '&quot;', \"'\": '&#39;' }[c]\n));\n\n// Une liste est « pleine » si elle a au moins un élément\nconst pleine = (liste) => Array.isArray(liste) && liste.length > 0;\n\n// ── Estimation de la hauteur du CV pour une taille de police donnée ───\n// n = { fs: taille en pt, lh: interligne, gap: espace entre blocs en px }\nconst lignes = (texte, parLigne) => Math.max(1, Math.ceil(String(texte ?? '').length / parLigne));\n\nfunction estimerHauteur(c, n) {\n  const px = (n.fs * 4) / 3;                  // pt → px\n  const ligne = px * n.lh;                    // hauteur d'une ligne de texte\n  const parLigne = 112 * (10 / n.fs);         // caractères par ligne (plus la police grossit, moins il y en a)\n  const titre = n.gap * 2.2 + 5 + 14 * n.lh;  // un titre de section (marges + filet + texte)\n  let h = 65;                                 // bandeau + sous-titre\n\n  // Profil\n  h += titre + lignes(c.accroche, parLigne - 4) * (((n.fs + 0.5) * 4 / 3) * n.lh) + 33;\n\n  // Bulles de compétences (retour à la ligne estimé selon la largeur)\n  const bulles = (liste) => {\n    if (!pleine(liste)) return 0;\n    let x = 0, rangees = 1;\n    for (const b of liste) {\n      const w = String(b).length * 5.9 + 28;\n      if (x + w > 720) { rangees++; x = 0; }\n      x += w;\n    }\n    return titre + rangees * 28;\n  };\n  h += bulles(c.competences_techniques) + bulles(c.competences_transverses);\n\n  // Expériences\n  h += titre;\n  for (const e of c.experiences ?? []) {\n    h += ligne + 6;\n    for (const m of e.missions ?? []) h += lignes(m, parLigne - 3) * ligne;\n    if (e.environnement) h += 3 + 12 * n.lh;\n    h += n.gap;\n  }\n\n  // Formation\n  h += titre + 6 + (c.formations ?? []).length * ligne;\n\n  // Langues | Certifications (côte à côte : on prend la plus haute)\n  const colonne = (liste) => (liste ?? []).reduce((s, x) => s + lignes(x, parLigne / 2 - 4), 0);\n  const duo = Math.max(colonne(c.langues), colonne(c.certifications));\n  if (duo > 0) h += titre + 6 + duo * ligne;\n\n  // Pied de page\n  h += n.gap * 1.2 + 8 + 1 + 15;\n  return h;\n}\n\n// Palier t entre 0 (compact) et 1 (aéré) → taille de police, interligne, espaces\nconst palier = (t) => ({ fs: 9.25 + t * 1.5, lh: 1.26 + t * 0.26, gap: 6 + t * 10 });\n\n// On prend le plus grand palier qui tient sur une page (sinon le plus petit)\nlet d = palier(0);\nfor (let i = NB_PALIERS - 1; i >= 0; i--) {\n  const candidat = palier(i / (NB_PALIERS - 1));\n  if (estimerHauteur(cv, candidat) <= HAUTEUR_MAX) { d = candidat; break; }\n}\nconst hauteurEstimee = Math.round(estimerHauteur(cv, d));\n\nconst bulles = (liste, classe = '') =>\n  (liste ?? []).map((x) => `<span class=\"bulle ${classe}\">${esc(x)}</span>`).join('');\n\nconst puces = (liste) => (liste ?? []).map((x) => `<li>${esc(x)}</li>`).join('');\n\n// Section standard : titre + contenu (rien si le contenu est vide)\nconst section = (titre, contenu, classe = '') =>\n  contenu ? `<section class=\"${classe}\"><h2>${esc(titre)}</h2>${contenu}</section>` : '';\n\n// Section de bulles : n'existe que si la liste a des éléments\nconst sectionBulles = (titre, liste, classeBulle = '') =>\n  pleine(liste)\n    ? section(titre, `<div class=\"bulles\">${bulles(liste, classeBulle)}</div>`, 'comp')\n    : '';\n\n// Une colonne (titre + liste), vide si pas de données\nconst colonne = (titre, liste) =>\n  pleine(liste) ? `<div><h2>${esc(titre)}</h2><ul>${puces(liste)}</ul></div>` : '';\n\nconst experiences = (cv.experiences ?? []).map((e) => `\n  <div class=\"exp\">\n    <div class=\"exp-tete\">\n      <div><span class=\"poste\">${esc(e.poste)}</span><span class=\"secteur\"> · ${esc(e.secteur)}</span></div>\n      <div class=\"periode\">${esc(e.periode)}</div>\n    </div>\n    <ul>${puces(e.missions)}</ul>\n    ${e.environnement ? `<p class=\"env\"><b>Environnement :</b> ${esc(e.environnement)}</p>` : ''}\n  </div>`).join('');\n\n// Formation : diplôme, type d'établissement, année\nconst formations = (cv.formations ?? []).map((f) =>\n  `<li><b>${esc(f.diplome)}</b> — ${esc(f.etablissement_type)}, ${esc(f.annee)}</li>`).join('');\n\n// Langues | Certifications côte à côte (pleine largeur si une seule des deux existe)\nconst duo = [\n  colonne('Langues', cv.langues),\n  colonne('Certifications', cv.certifications),\n].filter(Boolean);\n\nconst css = `\n@page { size: A4; margin: 14mm 0 8mm; }\n@page :first { margin-top: 0; }\n* { box-sizing: border-box; }\nbody { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #1f2937; font-size: ${d.fs}pt; line-height: ${d.lh}; -webkit-print-color-adjust: exact; print-color-adjust: exact; }\n\n/* Bandeau du haut : société (+ sous-titre) à gauche, référence à droite */\n.bandeau { background: #8C2F39; color: #fff; padding: 18px 36px; display: flex; justify-content: space-between; align-items: center; }\n.bandeau .societe { font-size: 17pt; font-weight: 700; letter-spacing: .5px; }\n.bandeau .dossier { font-size: 8pt; text-transform: uppercase; letter-spacing: 1.5px; opacity: .85; margin-top: 3px; }\n.bandeau .ref { text-align: right; }\n.bandeau .ref-titre { font-size: 8.5pt; opacity: .85; }\n.bandeau .ref-code { font-size: 18pt; font-weight: 700; letter-spacing: 1px; }\n\n.sous-titre { background: #E7ECF1; color: #334155; padding: 10px 36px; font-weight: 700; display: flex; justify-content: space-between; }\n.contenu { padding: 4px 36px 0; }\n\nsection { break-inside: avoid; }\nsection.longue { break-inside: auto; }\nh2 { font-size: 10.5pt; text-transform: uppercase; letter-spacing: .6px; color: #8C2F39; border-bottom: 2px solid #8C2F39; padding-bottom: 3px; margin: ${d.gap * 1.5}px 0 ${d.gap * 0.7}px; break-after: avoid; }\n\n/* Profil : fond bordeaux très clair + liseré à gauche + mention IA en bas à droite */\n.profil { background: #F5E6E8; border-left: 4px solid #8C2F39; padding: 10px 14px 6px; }\n.accroche { margin: 0; font-size: ${d.fs + 0.5}pt; }\n.mention-ia { margin: 4px 0 0; text-align: right; font-size: 7.5pt; font-style: italic; color: #6B2029; }\n\n/* Compétences : fond blanc, bulles centrées, deux sections */\nsection.comp h2 { text-align: center; }\n.bulles { text-align: center; }\n.bulle { display: inline-block; background: #F5E6E8; color: #6B2029; border-radius: 12px; padding: 3px 10px; margin: 0 4px 6px; font-size: 9pt; }\n.bulle.soft { background: #E7ECF1; color: #334155; }\n\n.exp { margin-bottom: ${d.gap}px; break-inside: avoid; }\n.exp-tete { display: flex; justify-content: space-between; }\n.poste { font-weight: 700; }\n.secteur, .periode { color: #4b5563; }\n.periode { white-space: nowrap; }\nul { margin: 3px 0 3px 18px; padding: 0; }\nli { break-inside: avoid; }\n.env { margin: 3px 0 0; color: #4b5563; font-size: 9pt; }\n\n/* Fin de page : Langues | Certifications + pied de page, jamais séparés */\n.fin { break-inside: avoid; }\n.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }\n.duo.seul { grid-template-columns: 1fr; }\n\n/* Pied de page : séparateur + mention officielle, à droite */\n.pied { margin: ${d.gap * 1.2}px 0 0; padding-top: 8px; border-top: 1px solid #d1d5db; text-align: right; color: #6b7280; font-size: 8pt; }\n`;\n\nconst html = `<!DOCTYPE html>\n<html lang=\"fr\">\n<head>\n<meta charset=\"utf-8\">\n<title>${esc(code)}</title>\n<style>${css}</style>\n</head>\n<body>\n  <div class=\"bandeau\">\n    <div>\n      <div class=\"societe\">${esc(NOM_SOCIETE)}</div>\n      <div class=\"dossier\">Dossier de compétences</div>\n    </div>\n    <div class=\"ref\">\n      <div class=\"ref-titre\">Réf. consultant</div>\n      <div class=\"ref-code\">${esc(code)}</div>\n    </div>\n  </div>\n  <div class=\"sous-titre\">\n    <div>${esc(cv.titre)}</div>\n    <div>${cv.annees_experience ? `${esc(cv.annees_experience)} ans d'expérience` : ''}</div>\n  </div>\n  <div class=\"contenu\">\n    ${cv.accroche ? section('Profil', `<div class=\"profil\"><p class=\"accroche\">${esc(cv.accroche)}</p><p class=\"mention-ia\">Synthèse rédigée par IA à partir du CV</p></div>`) : ''}\n    ${sectionBulles('Compétences techniques', cv.competences_techniques)}\n    ${sectionBulles('Compétences transverses', cv.competences_transverses, 'soft')}\n    ${section('Expériences', experiences, 'longue')}\n    ${section('Formation', formations ? `<ul>${formations}</ul>` : '')}\n    <div class=\"fin\">\n      ${duo.length ? `<section class=\"duo ${duo.length === 1 ? 'seul' : ''}\">${duo.join('')}</section>` : ''}\n      <p class=\"pied\">Document confidentiel — CV anonymisé conformément au RGPD — ${esc(NOM_SOCIETE)} · Réf. ${esc(code)}</p>\n    </div>\n  </div>\n</body>\n</html>`;\n\nreturn { json: { ...$json, html, mise_en_page: { police_pt: Math.round(d.fs * 100) / 100, hauteur_estimee: hauteurEstimee } } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        -16
+      ],
+      "id": "6b7e2464-af61-46f2-a0a6-255ef515ba63",
+      "name": "Mise en page HTML"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://gotenberg:3000/forms/chromium/convert/html",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "files",
+              "inputDataFieldName": "page"
+            },
+            {
+              "name": "preferCssPageSize",
+              "value": "true"
+            },
+            {
+              "name": "printBackground",
+              "value": "true"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        208,
+        416
+      ],
+      "id": "6a939920-549e-4b72-ac21-e509f5a622b8",
+      "name": "HTML to PDF"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "html",
+        "binaryPropertyName": "page",
+        "options": {
+          "fileName": "index.html"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        416
+      ],
+      "id": "f179d220-9e61-43f7-8d3a-5e282f71cdb7",
+      "name": "HTML to Text File"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/files/{{ $('Mise en page HTML').first().json.code_consultant }}.pdf",
+        "options": {
+          "append": false
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        416
+      ],
+      "id": "94fb3e27-7272-4cf8-b753-374992aad302",
+      "name": "Sauvegarde du CV anonyme"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "registre_consultants",
+        "columns": {
+          "column": [
+            {
+              "name": "code_consultant"
+            },
+            {
+              "name": "date_traitement"
+            },
+            {
+              "name": "prenom"
+            },
+            {
+              "name": "nom"
+            },
+            {
+              "name": "email"
+            },
+            {
+              "name": "telephone"
+            },
+            {
+              "name": "adresse"
+            },
+            {
+              "name": "liens"
+            },
+            {
+              "name": "titre"
+            },
+            {
+              "name": "annees_experience",
+              "type": "number"
+            },
+            {
+              "name": "competences"
+            },
+            {
+              "name": "lien_cv_anonyme"
+            },
+            {
+              "name": "fichier_source"
+            },
+            {
+              "name": "alertes_rgpd",
+              "type": "number"
+            },
+            {
+              "name": "alertes_detail"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        64,
+        688
+      ],
+      "id": "5fdad0a9-7cd7-4951-92f6-01815209376e",
+      "name": "Crée la table (si elle n'existe pas)"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "registre_consultants",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "code_consultant",
+              "displayName": "code_consultant",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "date_traitement",
+              "displayName": "date_traitement",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "prenom",
+              "displayName": "prenom",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "nom",
+              "displayName": "nom",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "telephone",
+              "displayName": "telephone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "adresse",
+              "displayName": "adresse",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "liens",
+              "displayName": "liens",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "titre",
+              "displayName": "titre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "annees_experience",
+              "displayName": "annees_experience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "competences",
+              "displayName": "competences",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "lien_cv_anonyme",
+              "displayName": "lien_cv_anonyme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fichier_source",
+              "displayName": "fichier_source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "alertes_rgpd",
+              "displayName": "alertes_rgpd",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        688
+      ],
+      "id": "45d483bf-71dc-4919-a058-b2cd39e6b115",
+      "name": "Inserer la ligne"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Adresse n8n\nconst URL_N8N = 'http://localhost:5678';\n\nconst d = $('Mise en page HTML').first().json;\nconst identite = d.identite ?? {};\nconst cv = d.cv_anonyme ?? {};\nconst alertes = d.alertes_rgpd ?? [];\n\n// \"jean-pierre\" -> \"Jean-Pierre\" ; \"d'artagnan\" -> \"D'Artagnan\"\nconst capitaliser = (s) =>\n  (s ?? '').trim().toLocaleLowerCase('fr')\n    .replace(/(^|[\\s'’-])(\\p{L})/gu, (m, sep, lettre) => sep + lettre.toLocaleUpperCase('fr'));\n\n// Une alerte peut être un texte ou un objet : on gère les deux\nconst alerteEnTexte = (a) => (typeof a === 'string' ? a : JSON.stringify(a));\n\nreturn {\n  json: {\n    code_consultant: d.code_consultant,\n    date_traitement: $now.toFormat('dd/MM/yyyy'),\n    prenom: capitaliser(identite.prenom),\n    nom: (identite.nom ?? '').trim().toLocaleUpperCase('fr'),\n    email: (identite.email ?? '').trim().toLowerCase(),\n    telephone: identite.telephone ?? '',\n    adresse: identite.adresse || identite.ville || '',\n    liens: [identite.linkedin, ...(identite.autres_liens ?? [])].filter(Boolean).join(', '),\n    titre: cv.titre ?? '',\n    annees_experience: Number(cv.annees_experience) || 0,\n    competences: (cv.competences_techniques ?? []).join(', '),\n    lien_cv_anonyme: `${URL_N8N}/webhook/cv-anonyme?code=${d.code_consultant}`,\n    fichier_source: $('Formulaire dépose CV').first().json.cv?.filename ?? '',\n    alertes_rgpd: alertes.length,\n    alertes_detail: alertes.map(alerteEnTexte).join(' ; '),\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        688
+      ],
+      "id": "ddf4c589-62a6-4275-bdaf-4eddca45aa5f",
+      "name": "Ligne du registre"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "registre_consultants",
+          "mode": "name"
+        },
+        "returnAll": true,
+        "orderBy": true,
+        "orderByDirection": "ASC"
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        736,
+        688
+      ],
+      "id": "55204cb0-36f3-402d-b18c-835643ec0532",
+      "name": "Lire le registre"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Renomme les colonnes techniques en en-têtes lisibles pour le fichier Excel\n// et jette les colonnes internes de la table (id, createdAt, updatedAt).\nreturn $input.all().map((item) => {\n  const r = item.json;\n  return {\n    json: {\n      'Code consultant': r.code_consultant,\n      'Date de traitement': r.date_traitement,\n      'Prénom': r.prenom,\n      'Nom': r.nom,\n      'E-mail': r.email,\n      'Téléphone': r.telephone,\n      'Adresse': r.adresse,\n      'Liens (LinkedIn, GitHub…)': r.liens,\n      'Poste': r.titre,\n      \"Années d'expérience\": r.annees_experience,\n      'Compétences': r.competences,\n      'Lien CV anonymisé': r.lien_cv_anonyme,\n      'Fichier source': r.fichier_source,\n      'Alertes RGPD': r.alertes_rgpd,\n      'Détails alertes': r.alertes_detail\n    },\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        688
+      ],
+      "id": "0bb19fec-a6c9-4827-9f8c-68f8bbab5810",
+      "name": "Nom colonnes Excel"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "fileName": "Registre CV"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        688
+      ],
+      "id": "e1f8c1ad-8b69-4d3d-bb7d-953a660daf92",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "content": "# Report",
+        "height": 688,
+        "width": 624,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1552,
+        256
+      ],
+      "id": "6a1a9901-b060-4eb3-9b02-2fe2bd7e4fa6",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('Mise en page HTML').first().json;\nconst n = (d.alertes_rgpd ?? []).length;\n\nconst alertes = n === 0\n  ? 'Aucune correction automatique du contrôle RGPD.'\n  : `${n} correction(s) automatique(s) du contrôle RGPD : à relire.`;\n\nreturn {\n  json: {\n    titre: `CV anonymisé : ${d.code_consultant}`,\n    message: [\n      `Le CV anonymisé est enregistré : ${d.code_consultant}.pdf`,\n      'Le registre interne est à jour (table et fichier Excel).',\n      alertes,\n    ].join('<br>'),\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        512
+      ],
+      "id": "f3691df1-450a-4c2b-8b18-6845f7451488",
+      "name": "Page de fin OK"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $('Mise en page HTML').first().json;\nconst e = $json.error;\nconst raison = typeof e === 'string' ? e : (e?.message ?? 'raison inconnue');\n\nreturn {\n  json: {\n    titre: `CV anonymisé : ${d.code_consultant} (Excel non mis à jour)`,\n    message: [\n      `Le CV anonymisé est enregistré : ${d.code_consultant}.pdf`,\n      'La ligne est bien dans la table du registre.',\n      \"Mais le fichier Excel n'a pas pu être écrit (est-il ouvert dans Excel ?).\",\n      'Ferme-le : le prochain CV déposé le régénérera en entier.',\n      `Détail technique : ${raison}`,\n    ].join('<br>'),\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        704
+      ],
+      "id": "79bfa926-3690-4a1f-b724-df1f82e0b2ab",
+      "name": "Page de fin erreur Excel"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "={{ $json.titre }}",
+        "completionMessage": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        1920,
+        608
+      ],
+      "id": "a377a645-1d66-4801-8089-554c984da30e",
+      "name": "Page de fin (affichage)",
+      "webhookId": "bad5adc1-90c3-4246-b3b5-a18859ab14ac"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/files/registre_consultants.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        688
+      ],
+      "id": "449c2833-3563-4291-b988-fa9d6f95f33a",
+      "name": "Sauvegarde du Excel",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "705e285a-638a-4274-8688-d28284f2c596",
+              "leftValue": "={{ $json.cv.mimetype }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        16,
+        -240
+      ],
+      "id": "de29a027-2fd8-48c3-882e-0434b0f5a9ad",
+      "name": "PDF ou DOCX ?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "6fe38ae2-d661-451a-bc4f-7ff205eda077",
+              "leftValue": "={{ ($json.text || '').trim().length }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        480,
+        -256
+      ],
+      "id": "c8dc21d4-751f-4591-a582-f64b0d1a759d",
+      "name": "Texte ?"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -48
+      ],
+      "id": "e224e077-0007-4cff-8cf7-ea675160206c",
+      "name": "Analyze image",
+      "credentials": {
+        "ollamaApi": {
+          "id": "p0wFyNwHGDSRDf0i",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "ministral-3:14b",
+        "options": {
+          "temperature": 0,
+          "keepAlive": "30m",
+          "numPredict": 8000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -96
+      ],
+      "id": "539a45e4-eaa9-4241-a738-b07658403239",
+      "name": "Modèle IA ①",
+      "credentials": {
+        "ollamaApi": {
+          "id": "p0wFyNwHGDSRDf0i",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "ministral-3:14b",
+        "options": {
+          "temperature": 0,
+          "keepAlive": "30m",
+          "numPredict": 12000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        16
+      ],
+      "id": "c5645c37-d75f-4f2a-bd2f-1db1bb7a442f",
+      "name": "Modèle IA ②",
+      "credentials": {
+        "ollamaApi": {
+          "id": "p0wFyNwHGDSRDf0i",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "binaryProperty": "cv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mistralAi",
+      "typeVersion": 1,
+      "position": [
+        656,
+        -112
+      ],
+      "id": "e3c5e4e5-fe4c-476c-a6ea-cfaed229afb2",
+      "name": "Vision",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "MHVFu2Gtpa8W7zfz",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Formulaire dépose CV": {
+      "main": [
+        [
+          {
+            "node": "PDF ou DOCX ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraction des infos du CV": {
+      "main": [
+        [
+          {
+            "node": "Préparer le dossier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from PDF": {
+      "main": [
+        [
+          {
+            "node": "Texte ?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Préparer le dossier": {
+      "main": [
+        [
+          {
+            "node": "Rédaction du CV anonymisé",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rédaction du CV anonymisé": {
+      "main": [
+        [
+          {
+            "node": "Contrôle RGPD",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format du CV anonymisé": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Rédaction du CV anonymisé",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DOCX to PDF": {
+      "main": [
+        [
+          {
+            "node": "Extract from PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contrôle RGPD": {
+      "main": [
+        [
+          {
+            "node": "Mise en page HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mise en page HTML": {
+      "main": [
+        [
+          {
+            "node": "HTML to Text File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to Text File": {
+      "main": [
+        [
+          {
+            "node": "HTML to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML to PDF": {
+      "main": [
+        [
+          {
+            "node": "Sauvegarde du CV anonyme",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crée la table (si elle n'existe pas)": {
+      "main": [
+        [
+          {
+            "node": "Ligne du registre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inserer la ligne": {
+      "main": [
+        [
+          {
+            "node": "Lire le registre",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ligne du registre": {
+      "main": [
+        [
+          {
+            "node": "Inserer la ligne",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lire le registre": {
+      "main": [
+        [
+          {
+            "node": "Nom colonnes Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nom colonnes Excel": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Sauvegarde du Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sauvegarde du CV anonyme": {
+      "main": [
+        [
+          {
+            "node": "Crée la table (si elle n'existe pas)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page de fin OK": {
+      "main": [
+        [
+          {
+            "node": "Page de fin (affichage)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page de fin erreur Excel": {
+      "main": [
+        [
+          {
+            "node": "Page de fin (affichage)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sauvegarde du Excel": {
+      "main": [
+        [
+          {
+            "node": "Page de fin OK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Page de fin erreur Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF ou DOCX ?": {
+      "main": [
+        [
+          {
+            "node": "Extract from PDF",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DOCX to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Texte ?": {
+      "main": [
+        [
+          {
+            "node": "Extraction des infos du CV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modèle IA ①": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Extraction des infos du CV",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Modèle IA ②": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Rédaction du CV anonymisé",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vision": {
+      "main": [
+        [
+          {
+            "node": "Extraction des infos du CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "68e8f04c-1909-4a8c-a3c1-b1aae4bd7b7b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4a14aa3c83848608319aa9494f286544e462c72f3a3d72f4d2dacb38f380c838"
+  },
+  "nodeGroups": [],
+  "id": "A78r64DXTWglRllj",
+  "tags": []
+}

@@ -1,5 +1,4 @@
-cours/
+docs/
 sorties/
-*.pdf
 .env
 *.ipynb
