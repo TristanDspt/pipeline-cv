@@ -3,3 +3,4 @@ sorties/
 .env
 *.ipynb
 *.png
+*.ppt

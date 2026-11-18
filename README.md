@@ -94,7 +94,7 @@ Prérequis : Docker et Docker Compose, **Ollama** installé sur la machine, une 
    ```
    Le premier démarrage construit l'image du service `pdf-images`.
 2. Ouvrir n8n sur `http://localhost:5678` et créer le compte local.
-3. Importer le workflow (`pipeline_cv_ollama.json`).
+3. Importer le workflow principal (`pipeline_cv_ollama.json`) et le workflow annexe `lien_cv_anonymisé.json` (voir plus bas), à **publier**.
 4. Créer l'identifiant **Ollama** dans n8n avec comme Base URL `http://host.docker.internal:11434` (aucune clé nécessaire) et l'associer aux trois nœuds Ollama : IA ①, IA ② et « Transcrire la page ».
 5. Sur ces trois nœuds, régler **exactement les mêmes options** : température `0`, contexte `18000`, keep-alive `30m` (voir plus bas pourquoi).
 6. Ouvrir le formulaire de test, déposer un CV.
@@ -150,6 +150,13 @@ Un PDF dont le texte extrait fait moins de 200 caractères est traité comme un 
 - mention « Synthèse rédigée par IA » sous le profil ;
 - pas de date sur le document ;
 - la **densité s'adapte au contenu** : un CV court est aéré (police plus grande, plus d'espace), un CV dense est resserré (jusqu'à 9,25 pt). L'estimation de hauteur est une heuristique, voir limites.
+
+### Workflow annexe : lien du CV anonymisé
+
+`lien_cv_anonymisé.json` expose une mini-API : `GET /webhook/cv-anonyme?code=CONS-XXXXXX`.
+Le code est validé par regex avant toute lecture disque (anti path traversal), puis le PDF
+est renvoyé (200), ou une erreur 404 (introuvable) / 400 (code invalide).
+Le lien est cliquable dans le registre Excel. Le workflow doit être **publié** pour que l'URL de production fonctionne.
 
 ### Registre interne (table n8n + `sorties/registre_consultants.xlsx`)
 
