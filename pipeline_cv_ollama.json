@@ -22,8 +22,8 @@
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.6,
       "position": [
-        -160,
-        -240
+        -480,
+        -320
       ],
       "id": "e4c44bea-dfbe-4dd2-b4e2-4fc7506fa3ae",
       "name": "Formulaire dépose CV",
@@ -41,7 +41,7 @@
       "type": "@n8n/n8n-nodes-langchain.informationExtractor",
       "typeVersion": 1.2,
       "position": [
-        832,
+        896,
         -272
       ],
       "id": "edb15036-e483-4f66-a1fd-4c3344d8b91b",
@@ -60,8 +60,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1.2,
       "position": [
-        304,
-        -256
+        -16,
+        -336
       ],
       "id": "e5656820-3fb9-47b0-b797-5ff5460ca95a",
       "name": "Extract from PDF"
@@ -69,15 +69,15 @@
     {
       "parameters": {
         "content": "# Extract",
-        "height": 640,
-        "width": 1360,
+        "height": 720,
+        "width": 1744,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -224,
-        -384
+        -544,
+        -448
       ],
       "id": "71cad1d3-6bb6-4b02-b913-f2a8e55b95aa",
       "name": "Sticky Note"
@@ -85,14 +85,14 @@
     {
       "parameters": {
         "content": "# Transform",
-        "height": 640,
-        "width": 1040
+        "height": 720,
+        "width": 976
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1136,
-        -384
+        1200,
+        -448
       ],
       "id": "aefc59ca-eb01-4860-8c84-ca1eef6f2407",
       "name": "Sticky Note1"
@@ -100,15 +100,15 @@
     {
       "parameters": {
         "content": "# Load",
-        "height": 688,
-        "width": 1776,
+        "height": 608,
+        "width": 2096,
         "color": 4
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -224,
-        256
+        -544,
+        272
       ],
       "id": "5613cee3-e1f4-4fa6-b058-05b1c899977d",
       "name": "Sticky Note2"
@@ -142,8 +142,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.5,
       "position": [
-        1216,
-        -176
+        1280,
+        -208
       ],
       "id": "ae840b50-9fa6-43c1-ace8-ab2798a24b87",
       "name": "Préparer le dossier"
@@ -158,8 +158,8 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        1168,
-        -16
+        1232,
+        -336
       ],
       "id": "935df73a-c851-4613-a131-42681844952a",
       "name": "Sticky Note3"
@@ -181,8 +181,8 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.9,
       "position": [
-        1440,
-        -176
+        1488,
+        -208
       ],
       "id": "83b55fba-b95a-4b14-a245-2a4048527ae2",
       "name": "Rédaction du CV anonymisé",
@@ -196,8 +196,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        1616,
-        16
+        1664,
+        -16
       ],
       "id": "31a1a8cd-be74-4f82-89af-3e352caffcc8",
       "name": "Format du CV anonymisé"
@@ -209,8 +209,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1808,
-        -176
+        1824,
+        -208
       ],
       "id": "a3159293-45de-4582-8c5e-60b28204a290",
       "name": "Contrôle RGPD"
@@ -225,7 +225,7 @@
       "typeVersion": 1,
       "position": [
         1744,
-        -368
+        -416
       ],
       "id": "2fd8bdbe-a639-47ee-9c02-fd7b6d58f740",
       "name": "Sticky Note4"
@@ -257,8 +257,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        160,
-        -112
+        -160,
+        -208
       ],
       "id": "391a92f5-55c0-4d74-89e5-bde5878220a8",
       "name": "DOCX to PDF"
@@ -272,7 +272,7 @@
       "typeVersion": 2,
       "position": [
         1984,
-        -16
+        -48
       ],
       "id": "6b7e2464-af61-46f2-a0a6-255ef515ba63",
       "name": "Mise en page HTML"
@@ -309,8 +309,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.5,
       "position": [
-        208,
-        416
+        -96,
+        368
       ],
       "id": "6a939920-549e-4b72-ac21-e509f5a622b8",
       "name": "HTML to PDF"
@@ -327,8 +327,8 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.2,
       "position": [
-        -16,
-        416
+        -320,
+        368
       ],
       "id": "f179d220-9e61-43f7-8d3a-5e282f71cdb7",
       "name": "HTML to Text File"
@@ -344,8 +344,8 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1.1,
       "position": [
-        432,
-        416
+        128,
+        368
       ],
       "id": "94fb3e27-7272-4cf8-b753-374992aad302",
       "name": "Sauvegarde du CV anonyme"
@@ -414,7 +414,7 @@
       "typeVersion": 1.1,
       "position": [
         64,
-        688
+        608
       ],
       "id": "5fdad0a9-7cd7-4951-92f6-01815209376e",
       "name": "Crée la table (si elle n'existe pas)"
@@ -581,7 +581,7 @@
       "typeVersion": 1.1,
       "position": [
         512,
-        688
+        608
       ],
       "id": "45d483bf-71dc-4919-a058-b2cd39e6b115",
       "name": "Inserer la ligne"
@@ -595,7 +595,7 @@
       "typeVersion": 2,
       "position": [
         288,
-        688
+        608
       ],
       "id": "ddf4c589-62a6-4275-bdaf-4eddca45aa5f",
       "name": "Ligne du registre"
@@ -616,7 +616,7 @@
       "typeVersion": 1.1,
       "position": [
         736,
-        688
+        608
       ],
       "id": "55204cb0-36f3-402d-b18c-835643ec0532",
       "name": "Lire le registre"
@@ -629,7 +629,7 @@
       "typeVersion": 2,
       "position": [
         928,
-        688
+        608
       ],
       "id": "0bb19fec-a6c9-4827-9f8c-68f8bbab5810",
       "name": "Nom colonnes Excel"
@@ -645,7 +645,7 @@
       "typeVersion": 1.2,
       "position": [
         1120,
-        688
+        608
       ],
       "id": "e1f8c1ad-8b69-4d3d-bb7d-953a660daf92",
       "name": "Convert to File"
@@ -653,7 +653,7 @@
     {
       "parameters": {
         "content": "# Report",
-        "height": 688,
+        "height": 608,
         "width": 624,
         "color": 3
       },
@@ -661,7 +661,7 @@
       "typeVersion": 1,
       "position": [
         1552,
-        256
+        272
       ],
       "id": "6a1a9901-b060-4eb3-9b02-2fe2bd7e4fa6",
       "name": "Sticky Note5"
@@ -674,20 +674,20 @@
       "typeVersion": 2,
       "position": [
         1664,
-        512
+        432
       ],
       "id": "f3691df1-450a-4c2b-8b18-6845f7451488",
       "name": "Page de fin OK"
     },
     {
       "parameters": {
-        "jsCode": "const d = $('Mise en page HTML').first().json;\nconst e = $json.error;\nconst raison = typeof e === 'string' ? e : (e?.message ?? 'raison inconnue');\n\nreturn {\n  json: {\n    titre: `CV anonymisé : ${d.code_consultant} (Excel non mis à jour)`,\n    message: [\n      `Le CV anonymisé est enregistré : ${d.code_consultant}.pdf`,\n      'La ligne est bien dans la table du registre.',\n      \"Mais le fichier Excel n'a pas pu être écrit (est-il ouvert dans Excel ?).\",\n      'Ferme-le : le prochain CV déposé le régénérera en entier.',\n      `Détail technique : ${raison}`,\n    ].join('<br>'),\n  },\n};"
+        "jsCode": "const d = $('Mise en page HTML').first().json;\nconst e = $json.error;\nconst raison = typeof e === 'string' ? e : (e?.message ?? 'raison inconnue');\n\nreturn {\n  json: {\n    titre: `CV anonymisé : ${d.code_consultant} (Excel non mis à jour)`,\n    message: [\n      `Le CV anonymisé est enregistré : ${d.code_consultant}.pdf`,\n      'La ligne est bien dans la table du registre.',\n      \"Mais le fichier Excel n'a pas pu être écrit (est-il ouvert ?).\",\n      'Ferme-le : le prochain CV déposé le régénérera en entier.',\n      `Détail technique : ${raison}`,\n    ].join('<br>'),\n  },\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
         1664,
-        704
+        624
       ],
       "id": "79bfa926-3690-4a1f-b724-df1f82e0b2ab",
       "name": "Page de fin erreur Excel"
@@ -703,7 +703,7 @@
       "typeVersion": 2.5,
       "position": [
         1920,
-        608
+        528
       ],
       "id": "a377a645-1d66-4801-8089-554c984da30e",
       "name": "Page de fin (affichage)",
@@ -719,7 +719,7 @@
       "typeVersion": 1.1,
       "position": [
         1312,
-        688
+        608
       ],
       "id": "449c2833-3563-4291-b988-fa9d6f95f33a",
       "name": "Sauvegarde du Excel",
@@ -752,8 +752,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.4,
       "position": [
-        16,
-        -240
+        -304,
+        -320
       ],
       "id": "de29a027-2fd8-48c3-882e-0434b0f5a9ad",
       "name": "PDF ou DOCX ?"
@@ -786,36 +786,11 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.4,
       "position": [
-        480,
-        -256
+        160,
+        -336
       ],
       "id": "c8dc21d4-751f-4591-a582-f64b0d1a759d",
       "name": "Texte ?"
-    },
-    {
-      "parameters": {
-        "resource": "image",
-        "modelId": {
-          "__rl": true,
-          "mode": "list",
-          "value": ""
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.ollama",
-      "typeVersion": 1,
-      "position": [
-        416,
-        -48
-      ],
-      "id": "e224e077-0007-4cff-8cf7-ea675160206c",
-      "name": "Analyze image",
-      "credentials": {
-        "ollamaApi": {
-          "id": "p0wFyNwHGDSRDf0i",
-          "name": "Ollama account"
-        }
-      }
     },
     {
       "parameters": {
@@ -823,14 +798,15 @@
         "options": {
           "temperature": 0,
           "keepAlive": "30m",
-          "numPredict": 8000
+          "numCtx": 18000,
+          "numPredict": 5000
         }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
       "typeVersion": 1,
       "position": [
-        912,
-        -96
+        960,
+        -80
       ],
       "id": "539a45e4-eaa9-4241-a738-b07658403239",
       "name": "Modèle IA ①",
@@ -847,14 +823,15 @@
         "options": {
           "temperature": 0,
           "keepAlive": "30m",
-          "numPredict": 12000
+          "numCtx": 18000,
+          "numPredict": 5000
         }
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
       "typeVersion": 1,
       "position": [
-        1424,
-        16
+        1456,
+        -16
       ],
       "id": "c5645c37-d75f-4f2a-bd2f-1db1bb7a442f",
       "name": "Modèle IA ②",
@@ -867,25 +844,124 @@
     },
     {
       "parameters": {
-        "binaryProperty": "cv",
+        "fieldToSplitOut": "pages",
         "options": {}
       },
-      "type": "n8n-nodes-base.mistralAi",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        -48
+      ],
+      "id": "734af14a-00d0-40ba-9eac-fcd90a742e26",
+      "name": "1 ligne par page"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "binaryPropertyName": "image",
+        "options": {
+          "fileName": "={{ 'page-' + $json.page + '.png' }}",
+          "mimeType": "image/png"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        -48
+      ],
+      "id": "c773a9ea-c8e5-44bb-a107-6f0156858fbf",
+      "name": "Base64 vers image"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "ministral-3:14b",
+          "mode": "list",
+          "cachedResultName": "ministral-3:14b"
+        },
+        "text": "Transcribe all the text in this image exactly as written. Do not summarize, rephrase, translate or correct anything. The document is in French: keep the original language, accents, numbers, e-mail addresses and phone numbers exactly as they appear. Reply only with the transcription, no comment.",
+        "binaryPropertyName": "image",
+        "options": {
+          "temperature": 0,
+          "num_predict": 5000,
+          "num_ctx": 18000,
+          "keep_alive": "30m"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.ollama",
       "typeVersion": 1,
       "position": [
-        656,
-        -112
+        528,
+        -48
       ],
-      "id": "e3c5e4e5-fe4c-476c-a6ea-cfaed229afb2",
-      "name": "Vision",
-      "retryOnFail": true,
-      "waitBetweenTries": 5000,
+      "id": "e224e077-0007-4cff-8cf7-ea675160206c",
+      "name": "Transcrire la page",
       "credentials": {
-        "mistralCloudApi": {
-          "id": "MHVFu2Gtpa8W7zfz",
-          "name": "Mistral Cloud account"
+        "ollamaApi": {
+          "id": "p0wFyNwHGDSRDf0i",
+          "name": "Ollama account"
         }
       }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Assemble le texte de toutes les pages scannées en un seul texte,\n// dans l'ordre des pages, pour l'envoyer à l'extraction.\nconst pages = $input.all().map((item) => item.json.content ?? '');\n\nreturn [{ json: { text: pages.join('\\n\\n') } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        -48
+      ],
+      "id": "dea02fbd-f841-4185-9dc8-ec0c1c60f881",
+      "name": "Assembler les pages"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://pdf-images:8000/convert",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "cv"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        0,
+        -48
+      ],
+      "id": "970ff5d5-e569-4b18-a5a8-051ec0a7bdae",
+      "name": "PDF -> Image"
+    },
+    {
+      "parameters": {
+        "content": "### CV scanné → vision (bottom branch)\nPDF → images → transcription Ollama (1 page = 1 appel) → texte → extraction",
+        "height": 96,
+        "width": 384,
+        "color": "#FFFFFF"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -176
+      ],
+      "id": "9bfd691d-acd1-4d5f-b113-3407f22597e8",
+      "name": "Sticky Note6"
     }
   ],
   "pinData": {},
@@ -1157,7 +1233,7 @@
         ],
         [
           {
-            "node": "Vision",
+            "node": "PDF -> Image",
             "type": "main",
             "index": 0
           }
@@ -1186,7 +1262,51 @@
         ]
       ]
     },
-    "Vision": {
+    "1 ligne par page": {
+      "main": [
+        [
+          {
+            "node": "Base64 vers image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Base64 vers image": {
+      "main": [
+        [
+          {
+            "node": "Transcrire la page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcrire la page": {
+      "main": [
+        [
+          {
+            "node": "Assembler les pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PDF -> Image": {
+      "main": [
+        [
+          {
+            "node": "1 ligne par page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Assembler les pages": {
       "main": [
         [
           {
@@ -1203,7 +1323,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "68e8f04c-1909-4a8c-a3c1-b1aae4bd7b7b",
+  "versionId": "0a5df515-1ba1-4a5d-b0b3-34319c180a16",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "4a14aa3c83848608319aa9494f286544e462c72f3a3d72f4d2dacb38f380c838"
