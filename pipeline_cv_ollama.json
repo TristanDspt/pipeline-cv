@@ -69,7 +69,7 @@
     {
       "parameters": {
         "content": "# Extract",
-        "height": 720,
+        "height": 672,
         "width": 1744,
         "color": 6
       },
@@ -85,7 +85,7 @@
     {
       "parameters": {
         "content": "# Transform",
-        "height": 720,
+        "height": 672,
         "width": 976
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -108,7 +108,7 @@
       "typeVersion": 1,
       "position": [
         -544,
-        272
+        224
       ],
       "id": "5613cee3-e1f4-4fa6-b058-05b1c899977d",
       "name": "Sticky Note2"
@@ -661,7 +661,7 @@
       "typeVersion": 1,
       "position": [
         1552,
-        272
+        224
       ],
       "id": "6a1a9901-b060-4eb3-9b02-2fe2bd7e4fa6",
       "name": "Sticky Note5"
@@ -1323,7 +1323,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "0a5df515-1ba1-4a5d-b0b3-34319c180a16",
+  "versionId": "17a1c6e6-ecc2-40ed-a437-22480f4c99e7",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "4a14aa3c83848608319aa9494f286544e462c72f3a3d72f4d2dacb38f380c838"
